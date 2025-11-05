@@ -30,7 +30,7 @@ public class AuthService {
         userRepository.save(user);
 
         String token = jwtUtil.generateToken(user.getEmail());
-        return new AuthResponse("Signup successful", token);
+        return new AuthResponse(token,"Signup successful" );
     }
 
     public AuthResponse login(LoginRequest request) {
@@ -42,7 +42,7 @@ public class AuthService {
         }
 
         String token = jwtUtil.generateToken(user.getEmail());
-        return new AuthResponse("Login successful", token);
+        return new AuthResponse(token,"Login successful");
     }
 }
 
