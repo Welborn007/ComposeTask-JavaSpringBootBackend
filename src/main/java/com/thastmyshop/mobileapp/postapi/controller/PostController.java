@@ -19,8 +19,10 @@ public class PostController {
 
     // 🔒 Requires JWT (secured)
     @PostMapping
-    public ResponseEntity<Post> createPost(@RequestBody Post post) {
-        return ResponseEntity.ok(postService.createPost(post));
+    public ResponseEntity<Post> createPost(
+            @RequestBody Post post,
+            @RequestHeader("Authorization") String token) {
+        return ResponseEntity.ok(postService.createPost(post,token));
     }
 
     // 🌐 Public - anyone can read
@@ -28,4 +30,10 @@ public class PostController {
     public ResponseEntity<List<Post>> getAllPosts() {
         return ResponseEntity.ok(postService.getAllPosts());
     }
+
+    @GetMapping("/my")
+    public ResponseEntity<List<Post>> getMyPosts(@RequestHeader("Authorization") String token) {
+        return ResponseEntity.ok(postService.getMyPosts(token));
+    }
+
 }
