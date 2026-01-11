@@ -1,6 +1,9 @@
 package com.composetask.mobileapp.postapi.service;
 
 import com.composetask.mobileapp.config.JwtUtil;
+import com.composetask.mobileapp.postapi.dto.CreatePostRequest;
+import com.composetask.mobileapp.postapi.dto.PostResponse;
+import com.composetask.mobileapp.postapi.dto.UserSummary;
 import com.composetask.mobileapp.postapi.model.Post;
 import com.composetask.mobileapp.postapi.repository.PostRepository;
 import com.composetask.mobileapp.userapi.model.User;
@@ -21,33 +24,55 @@ public class PostService {
         this.jwtUtil = jwtUtil;
     }
 
-    public Post createPost(Post post, String token) {
-        // remove "Bearer "
-        token = token.replace("Bearer ", "");
+    // 🔒 Create Post
+    public PostResponse createPost(CreatePostRequest request, String token) {
 
-        String email = jwtUtil.extractEmail(token);
+        String email = jwtUtil.extractEmail(token.replace("Bearer ", ""));
 
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
+        Post post = new Post();
+        post.setTitle(request.getTitle());
+        post.setContent(request.getContent());
         post.setUser(user);
-        return postRepository.save(post);
+
+        return mapToResponse(postRepository.save(post));
     }
 
-    public List<Post> getAllPosts() {
-        return postRepository.findAll();
+    // 🌐 Get all posts
+    public List<PostResponse> getAllPosts() {
+        return postRepository.findAll()
+                .stream()
+                .map(this::mapToResponse)
+                .toList();
     }
 
-    public List<Post> getMyPosts(String token) {
+    // 🔐 Get my posts
+    public List<PostResponse> getMyPosts(String token) {
 
-        token = token.replace("Bearer ", "");
-
-        String email = jwtUtil.extractEmail(token);
+        String email = jwtUtil.extractEmail(token.replace("Bearer ", ""));
 
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        return postRepository.findByUser(user);
+        return postRepository.findByUser(user)
+                .stream()
+                .map(this::mapToResponse)
+                .toList();
+    }
+
+    // 🔁 Mapper
+    private PostResponse mapToResponse(Post post) {
+        return new PostResponse(
+                post.getId(),
+                post.getTitle(),
+                post.getContent(),
+                new UserSummary(
+                        post.getUser().getId(),
+                        post.getUser().getName()
+                )
+        );
     }
 
 }

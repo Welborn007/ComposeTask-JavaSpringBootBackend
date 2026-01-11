@@ -1,7 +1,11 @@
 package com.composetask.mobileapp.postapi.controller;
 
+import com.composetask.mobileapp.postapi.dto.CreatePostRequest;
+import com.composetask.mobileapp.postapi.dto.PostResponse;
 import com.composetask.mobileapp.postapi.model.Post;
 import com.composetask.mobileapp.postapi.service.PostService;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -9,31 +13,31 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/posts")
+@RequiredArgsConstructor
 public class PostController {
 
     private final PostService postService;
 
-    public PostController(PostService postService) {
-        this.postService = postService;
-    }
-
-    // 🔒 Requires JWT (secured)
+    // 🔒 Requires JWT
     @PostMapping
-    public ResponseEntity<Post> createPost(
-            @RequestBody Post post,
-            @RequestHeader("Authorization") String token) {
-        return ResponseEntity.ok(postService.createPost(post,token));
+    public ResponseEntity<PostResponse> createPost(
+            @RequestBody @Valid CreatePostRequest request,
+            @RequestHeader("Authorization") String token
+    ) {
+        return ResponseEntity.ok(postService.createPost(request, token));
     }
 
-    // 🌐 Public - anyone can read
+    // 🌐 Public
     @GetMapping
-    public ResponseEntity<List<Post>> getAllPosts() {
+    public ResponseEntity<List<PostResponse>> getAllPosts() {
         return ResponseEntity.ok(postService.getAllPosts());
     }
 
+    // 🔐 My posts
     @GetMapping("/my")
-    public ResponseEntity<List<Post>> getMyPosts(@RequestHeader("Authorization") String token) {
+    public ResponseEntity<List<PostResponse>> getMyPosts(
+            @RequestHeader("Authorization") String token
+    ) {
         return ResponseEntity.ok(postService.getMyPosts(token));
     }
-
 }
