@@ -1,7 +1,10 @@
 package com.composetask.mobileapp.userapi.controller;
 
+import com.composetask.mobileapp.userapi.dto.UpdateUserRequest;
+import com.composetask.mobileapp.userapi.dto.UserResponse;
 import com.composetask.mobileapp.userapi.model.User;
 import com.composetask.mobileapp.userapi.service.UserService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,25 +20,20 @@ public class UserController {
         this.userService = userService;
     }
 
-    @PostMapping
-    public ResponseEntity<User> createUser(@RequestBody User user) {
-        return ResponseEntity.ok(userService.saveUser(user));
-    }
-
     @GetMapping
-    public ResponseEntity<List<User>> getAllUsers() {
+    public ResponseEntity<List<UserResponse>> getAllUsers() {
         return ResponseEntity.ok(userService.getAllUsers());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<User> getUserById(@PathVariable Long id) {
-        User user = userService.getUserById(id);
+    public ResponseEntity<UserResponse> getUserById(@PathVariable Long id) {
+        UserResponse user = userService.getUserById(id);
         return (user != null) ? ResponseEntity.ok(user) : ResponseEntity.notFound().build();
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody User user) {
-        User updated = userService.updateUser(id, user);
+    public ResponseEntity<UserResponse> updateUser(@PathVariable Long id, @RequestBody @Valid UpdateUserRequest request) {
+        UserResponse updated = userService.updateUser(id, request);
         return (updated != null) ? ResponseEntity.ok(updated) : ResponseEntity.notFound().build();
     }
 

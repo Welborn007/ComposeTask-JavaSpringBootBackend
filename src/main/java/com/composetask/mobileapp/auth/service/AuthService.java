@@ -1,9 +1,9 @@
-package com.composetask.mobileapp.userapi.service;
+package com.composetask.mobileapp.auth.service;
 
 import com.composetask.mobileapp.config.JwtUtil;
-import com.composetask.mobileapp.userapi.dto.AuthResponse;
-import com.composetask.mobileapp.userapi.dto.LoginRequest;
-import com.composetask.mobileapp.userapi.dto.SignupRequest;
+import com.composetask.mobileapp.auth.dto.AuthResponse;
+import com.composetask.mobileapp.auth.dto.LoginRequest;
+import com.composetask.mobileapp.auth.dto.SignupRequest;
 import com.composetask.mobileapp.userapi.model.User;
 import com.composetask.mobileapp.userapi.repository.UserRepository;
 import lombok.RequiredArgsConstructor;

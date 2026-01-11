@@ -1,4 +1,4 @@
-package com.composetask.mobileapp.userapi.dto;
+package com.composetask.mobileapp.auth.dto;
 
 import lombok.Data;
 

@@ -1,5 +1,7 @@
 package com.composetask.mobileapp.userapi.service;
 
+import com.composetask.mobileapp.userapi.dto.UpdateUserRequest;
+import com.composetask.mobileapp.userapi.dto.UserResponse;
 import com.composetask.mobileapp.userapi.model.User;
 import com.composetask.mobileapp.userapi.repository.UserRepository;
 import org.springframework.stereotype.Service;
@@ -15,27 +17,50 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
-    public User saveUser(User user) {
-        return userRepository.save(user);
+    public List<UserResponse> getAllUsers() {
+        return userRepository.findAll()
+                .stream()
+                .map(user -> new UserResponse(
+                        user.getId(),
+                        user.getName(),
+                        user.getEmail()
+                ))
+                .toList();
     }
 
-    public List<User> getAllUsers() {
-        return userRepository.findAll();
+    public UserResponse getUserById(Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        return mapToUserResponse(user);
     }
 
-    public User getUserById(Long id) {
-        return userRepository.findById(id).orElse(null);
+    // ✅ Update user
+    public UserResponse updateUser(Long id, UpdateUserRequest request) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        user.setName(request.getName());
+        user.setEmail(request.getEmail());
+
+        User saved = userRepository.save(user);
+        return mapToUserResponse(saved);
     }
 
-    public User updateUser(Long id, User updatedUser) {
-        return userRepository.findById(id).map(user -> {
-            user.setName(updatedUser.getName());
-            user.setEmail(updatedUser.getEmail());
-            return userRepository.save(user);
-        }).orElse(null);
-    }
-
+    // ✅ Delete user
     public void deleteUser(Long id) {
+        if (!userRepository.existsById(id)) {
+            throw new RuntimeException("User not found");
+        }
         userRepository.deleteById(id);
+    }
+
+    // 🔁 Mapper (private)
+    private UserResponse mapToUserResponse(User user) {
+        return new UserResponse(
+                user.getId(),
+                user.getName(),
+                user.getEmail()
+        );
     }
 }

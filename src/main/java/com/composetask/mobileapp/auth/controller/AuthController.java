@@ -1,9 +1,9 @@
-package com.composetask.mobileapp.userapi.controller;
+package com.composetask.mobileapp.auth.controller;
 
-import com.composetask.mobileapp.userapi.dto.AuthResponse;
-import com.composetask.mobileapp.userapi.dto.LoginRequest;
-import com.composetask.mobileapp.userapi.dto.SignupRequest;
-import com.composetask.mobileapp.userapi.service.AuthService;
+import com.composetask.mobileapp.auth.dto.AuthResponse;
+import com.composetask.mobileapp.auth.dto.LoginRequest;
+import com.composetask.mobileapp.auth.dto.SignupRequest;
+import com.composetask.mobileapp.auth.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
