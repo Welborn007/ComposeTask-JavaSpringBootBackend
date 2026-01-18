@@ -1,5 +1,6 @@
 package com.composetask.mobileapp.postapi.service;
 
+import com.composetask.mobileapp.common.exception.ResourceNotFoundException;
 import com.composetask.mobileapp.config.JwtUtil;
 import com.composetask.mobileapp.postapi.dto.CreatePostRequest;
 import com.composetask.mobileapp.postapi.dto.PostResponse;
@@ -30,7 +31,7 @@ public class PostService {
         String email = jwtUtil.extractEmail(token.replace("Bearer ", ""));
 
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         Post post = new Post();
         post.setTitle(request.getTitle());
@@ -54,7 +55,7 @@ public class PostService {
         String email = jwtUtil.extractEmail(token.replace("Bearer ", ""));
 
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         return postRepository.findByUser(user)
                 .stream()

@@ -1,5 +1,8 @@
 package com.composetask.mobileapp.auth.service;
 
+import com.composetask.mobileapp.common.exception.BadRequestException;
+import com.composetask.mobileapp.common.exception.ResourceNotFoundException;
+import com.composetask.mobileapp.common.exception.UnauthorizedException;
 import com.composetask.mobileapp.config.JwtUtil;
 import com.composetask.mobileapp.auth.dto.AuthResponse;
 import com.composetask.mobileapp.auth.dto.LoginRequest;
@@ -20,7 +23,7 @@ public class AuthService {
 
     public AuthResponse signup(SignupRequest request) {
         if (userRepository.findByEmail(request.getEmail()).isPresent()) {
-            throw new RuntimeException("Email already registered!");
+            throw new BadRequestException("Email already registered!");
         }
 
         User user = new User();
@@ -35,10 +38,10 @@ public class AuthService {
 
     public AuthResponse login(LoginRequest request) {
         User user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            throw new RuntimeException("Invalid password");
+            throw new UnauthorizedException("Invalid password");
         }
 
         String token = jwtUtil.generateToken(user.getEmail());

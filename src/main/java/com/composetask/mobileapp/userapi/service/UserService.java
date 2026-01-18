@@ -1,5 +1,6 @@
 package com.composetask.mobileapp.userapi.service;
 
+import com.composetask.mobileapp.common.exception.ResourceNotFoundException;
 import com.composetask.mobileapp.userapi.dto.UpdateUserRequest;
 import com.composetask.mobileapp.userapi.dto.UserResponse;
 import com.composetask.mobileapp.userapi.model.User;
@@ -30,7 +31,7 @@ public class UserService {
 
     public UserResponse getUserById(Long id) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         return mapToUserResponse(user);
     }
@@ -38,7 +39,7 @@ public class UserService {
     // ✅ Update user
     public UserResponse updateUser(Long id, UpdateUserRequest request) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         user.setName(request.getName());
         user.setEmail(request.getEmail());
@@ -50,7 +51,7 @@ public class UserService {
     // ✅ Delete user
     public void deleteUser(Long id) {
         if (!userRepository.existsById(id)) {
-            throw new RuntimeException("User not found");
+            throw new ResourceNotFoundException("User not found");
         }
         userRepository.deleteById(id);
     }
