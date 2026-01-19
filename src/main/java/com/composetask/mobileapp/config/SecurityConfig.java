@@ -47,6 +47,9 @@ public class SecurityConfig {
                         // Secure POST for posts
                         .requestMatchers(HttpMethod.POST, "/api/posts/**").authenticated()
 
+                        .requestMatchers(HttpMethod.PUT, "/api/posts/**").authenticated()
+                        .requestMatchers(HttpMethod.DELETE, "/api/posts/**").authenticated()
+
                         // Everything else needs authentication
                         .anyRequest().authenticated()
                 )

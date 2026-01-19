@@ -3,6 +3,7 @@ package com.composetask.mobileapp.postapi.controller;
 import com.composetask.mobileapp.common.dto.PageResponse;
 import com.composetask.mobileapp.postapi.dto.CreatePostRequest;
 import com.composetask.mobileapp.postapi.dto.PostResponse;
+import com.composetask.mobileapp.postapi.dto.UpdatePostRequest;
 import com.composetask.mobileapp.postapi.model.Post;
 import com.composetask.mobileapp.postapi.service.PostService;
 import jakarta.validation.Valid;
@@ -49,4 +50,25 @@ public class PostController {
     ) {
         return ResponseEntity.ok(postService.getMyPosts(token, pageable));
     }
+
+    // 🔒 Update post (owner only)
+    @PutMapping("/{id}")
+    public ResponseEntity<PostResponse> updatePost(
+            @PathVariable Long id,
+            @RequestBody UpdatePostRequest request,
+            @RequestHeader("Authorization") String token
+    ) {
+        return ResponseEntity.ok(postService.updatePost(id, request, token));
+    }
+
+    // 🔒 Delete post (owner only)
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deletePost(
+            @PathVariable Long id,
+            @RequestHeader("Authorization") String token
+    ) {
+        postService.deletePost(id, token);
+        return ResponseEntity.noContent().build();
+    }
+
 }

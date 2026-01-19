@@ -2,9 +2,11 @@ package com.composetask.mobileapp.postapi.service;
 
 import com.composetask.mobileapp.common.dto.PageResponse;
 import com.composetask.mobileapp.common.exception.ResourceNotFoundException;
+import com.composetask.mobileapp.common.exception.UnauthorizedException;
 import com.composetask.mobileapp.config.JwtUtil;
 import com.composetask.mobileapp.postapi.dto.CreatePostRequest;
 import com.composetask.mobileapp.postapi.dto.PostResponse;
+import com.composetask.mobileapp.postapi.dto.UpdatePostRequest;
 import com.composetask.mobileapp.postapi.dto.UserSummary;
 import com.composetask.mobileapp.postapi.model.Post;
 import com.composetask.mobileapp.postapi.repository.PostRepository;
@@ -101,6 +103,42 @@ public class PostService {
                         post.getUser().getName()
                 )
         );
+    }
+
+    public PostResponse updatePost(
+            Long postId,
+            UpdatePostRequest request,
+            String token
+    ) {
+        String email = jwtUtil.extractEmail(token.replace("Bearer ", ""));
+
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new ResourceNotFoundException("Post not found"));
+
+        // 🔥 OWNERSHIP CHECK
+        if (!post.getUser().getEmail().equals(email)) {
+            throw new UnauthorizedException("You are not allowed to update this post");
+        }
+
+        post.setTitle(request.getTitle());
+        post.setContent(request.getContent());
+
+        Post updated = postRepository.save(post);
+        return mapToResponse(updated);
+    }
+
+    public void deletePost(Long postId, String token) {
+        String email = jwtUtil.extractEmail(token.replace("Bearer ", ""));
+
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new ResourceNotFoundException("Post not found"));
+
+        // 🔥 OWNERSHIP CHECK
+        if (!post.getUser().getEmail().equals(email)) {
+            throw new UnauthorizedException("You are not allowed to delete this post");
+        }
+
+        postRepository.delete(post);
     }
 
 }
