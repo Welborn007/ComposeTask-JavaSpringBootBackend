@@ -1,6 +1,7 @@
 package com.composetask.mobileapp.common.exception;
 
 import com.composetask.mobileapp.common.dto.ApiErrorResponse;
+import io.swagger.v3.oas.annotations.Hidden;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -9,6 +10,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.time.LocalDateTime;
 
+@Hidden
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 

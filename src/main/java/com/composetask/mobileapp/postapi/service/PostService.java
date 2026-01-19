@@ -1,5 +1,6 @@
 package com.composetask.mobileapp.postapi.service;
 
+import com.composetask.mobileapp.common.dto.PageResponse;
 import com.composetask.mobileapp.common.exception.ResourceNotFoundException;
 import com.composetask.mobileapp.config.JwtUtil;
 import com.composetask.mobileapp.postapi.dto.CreatePostRequest;
@@ -9,6 +10,8 @@ import com.composetask.mobileapp.postapi.model.Post;
 import com.composetask.mobileapp.postapi.repository.PostRepository;
 import com.composetask.mobileapp.userapi.model.User;
 import com.composetask.mobileapp.userapi.repository.UserRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import java.util.List;
 
@@ -42,26 +45,50 @@ public class PostService {
     }
 
     // 🌐 Get all posts
-    public List<PostResponse> getAllPosts() {
-        return postRepository.findAll()
+    public PageResponse<PostResponse> getAllPosts(Pageable pageable) {
+
+        Page<Post> page = postRepository.findAll(pageable);
+
+        List<PostResponse> content = page.getContent()
                 .stream()
                 .map(this::mapToResponse)
                 .toList();
+
+        return new PageResponse<>(
+                content,
+                page.getNumber(),
+                page.getSize(),
+                page.getTotalElements(),
+                page.getTotalPages(),
+                page.isLast()
+        );
     }
 
     // 🔐 Get my posts
-    public List<PostResponse> getMyPosts(String token) {
+    public PageResponse<PostResponse> getMyPosts(String token, Pageable pageable) {
 
         String email = jwtUtil.extractEmail(token.replace("Bearer ", ""));
 
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
-        return postRepository.findByUser(user)
+        Page<Post> page = postRepository.findByUser(user, pageable);
+
+        List<PostResponse> content = page.getContent()
                 .stream()
                 .map(this::mapToResponse)
                 .toList();
+
+        return new PageResponse<>(
+                content,
+                page.getNumber(),
+                page.getSize(),
+                page.getTotalElements(),
+                page.getTotalPages(),
+                page.isLast()
+        );
     }
+
 
     // 🔁 Mapper
     private PostResponse mapToResponse(Post post) {
