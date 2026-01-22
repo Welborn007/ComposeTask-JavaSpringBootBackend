@@ -1,5 +1,6 @@
 package com.composetask.mobileapp.postapi.controller;
 
+import com.composetask.mobileapp.common.dto.ApiResponse;
 import com.composetask.mobileapp.common.dto.PageResponse;
 import com.composetask.mobileapp.postapi.dto.CreatePostRequest;
 import com.composetask.mobileapp.postapi.dto.PostResponse;
@@ -11,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,20 +27,28 @@ public class PostController {
 
     // 🔒 Requires JWT
     @PostMapping
-    public ResponseEntity<PostResponse> createPost(
+    public ResponseEntity<ApiResponse<PostResponse>> createPost(
             @RequestBody @Valid CreatePostRequest request,
             @RequestHeader("Authorization") String token
     ) {
-        return ResponseEntity.ok(postService.createPost(request, token));
+        PostResponse response = postService.createPost(request, token);
+
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ApiResponse.success(response, "Post created successfully"));
     }
 
     // 🌐 Public
     @GetMapping
-    public ResponseEntity<PageResponse<PostResponse>> getAllPosts(
+    public ResponseEntity<ApiResponse<PageResponse<PostResponse>>> getAllPosts(
             @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC)
             Pageable pageable
     ) {
-        return ResponseEntity.ok(postService.getAllPosts(pageable));
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        postService.getAllPosts(pageable),
+                        "Posts fetched successfully"
+                )
+        );
     }
 
     // 🔐 My posts
@@ -53,22 +63,29 @@ public class PostController {
 
     // 🔒 Update post (owner only)
     @PutMapping("/{id}")
-    public ResponseEntity<PostResponse> updatePost(
+    public ResponseEntity<ApiResponse<PostResponse>>updatePost(
             @PathVariable Long id,
             @RequestBody UpdatePostRequest request,
             @RequestHeader("Authorization") String token
     ) {
-        return ResponseEntity.ok(postService.updatePost(id, request, token));
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        postService.updatePost(id, request, token),
+                        "Post updated successfully"
+                )
+        );
     }
 
     // 🔒 Delete post (owner only)
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletePost(
+    public ResponseEntity<ApiResponse<Void>> deletePost(
             @PathVariable Long id,
             @RequestHeader("Authorization") String token
     ) {
         postService.deletePost(id, token);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(
+                ApiResponse.success(null, "Post deleted successfully")
+        );
     }
 
 }

@@ -4,6 +4,7 @@ import com.composetask.mobileapp.auth.dto.AuthResponse;
 import com.composetask.mobileapp.auth.dto.LoginRequest;
 import com.composetask.mobileapp.auth.dto.SignupRequest;
 import com.composetask.mobileapp.auth.service.AuthService;
+import com.composetask.mobileapp.common.dto.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,7 +25,12 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthResponse> login(@RequestBody LoginRequest request) {
-        return ResponseEntity.ok(authService.login(request));
+    public ResponseEntity<ApiResponse<AuthResponse>> login(@RequestBody LoginRequest request) {
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        authService.login(request),
+                        "Login successful"
+                )
+        );
     }
 }

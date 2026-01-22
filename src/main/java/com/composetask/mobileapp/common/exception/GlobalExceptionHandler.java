@@ -1,67 +1,46 @@
 package com.composetask.mobileapp.common.exception;
 
-import com.composetask.mobileapp.common.dto.ApiErrorResponse;
+import com.composetask.mobileapp.common.dto.ApiResponse;
 import io.swagger.v3.oas.annotations.Hidden;
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-
-import java.time.LocalDateTime;
 
 @Hidden
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<ApiErrorResponse> handleNotFound(
-            ResourceNotFoundException ex,
-            HttpServletRequest request
+    public ResponseEntity<ApiResponse<Void>> handleNotFound(
+            ResourceNotFoundException ex
     ) {
-        return buildError(HttpStatus.NOT_FOUND, ex.getMessage(), request);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(ApiResponse.failure(ex.getMessage()));
     }
 
     @ExceptionHandler(BadRequestException.class)
-    public ResponseEntity<ApiErrorResponse> handleBadRequest(
-            BadRequestException ex,
-            HttpServletRequest request
+    public ResponseEntity<ApiResponse<Void>> handleBadRequest(
+            BadRequestException ex
     ) {
-        return buildError(HttpStatus.BAD_REQUEST, ex.getMessage(), request);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ApiResponse.failure(ex.getMessage()));
     }
 
     @ExceptionHandler(UnauthorizedException.class)
-    public ResponseEntity<ApiErrorResponse> handleUnauthorized(
-            UnauthorizedException ex,
-            HttpServletRequest request
+    public ResponseEntity<ApiResponse<Void>> handleUnauthorized(
+            UnauthorizedException ex
     ) {
-        return buildError(HttpStatus.UNAUTHORIZED, ex.getMessage(), request);
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(ApiResponse.failure(ex.getMessage()));
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ApiErrorResponse> handleGeneric(
-            Exception ex,
-            HttpServletRequest request
-    ) {
-        return buildError(
-                HttpStatus.INTERNAL_SERVER_ERROR,
-                "Something went wrong",
-                request
-        );
-    }
+    public ResponseEntity<ApiResponse<Void>> handleGeneric(Exception ex) {
 
-    private ResponseEntity<ApiErrorResponse> buildError(
-            HttpStatus status,
-            String message,
-            HttpServletRequest request
-    ) {
-        ApiErrorResponse response = new ApiErrorResponse(
-                LocalDateTime.now(),
-                status.value(),
-                status.name(),
-                message,
-                request.getRequestURI()
-        );
-        return new ResponseEntity<>(response, status);
+        // log ex internally if needed
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(ApiResponse.failure("Something went wrong"));
     }
 }
+
