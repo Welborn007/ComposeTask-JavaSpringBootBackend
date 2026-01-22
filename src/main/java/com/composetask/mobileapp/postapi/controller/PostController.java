@@ -28,13 +28,14 @@ public class PostController {
     // 🔒 Requires JWT
     @PostMapping
     public ResponseEntity<ApiResponse<PostResponse>> createPost(
-            @RequestBody @Valid CreatePostRequest request,
+            @Valid @RequestBody CreatePostRequest request,
             @RequestHeader("Authorization") String token
     ) {
-        PostResponse response = postService.createPost(request, token);
-
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(ApiResponse.success(response, "Post created successfully"));
+                .body(ApiResponse.success(
+                        postService.createPost(request, token),
+                        "Post created successfully"
+                ));
     }
 
     // 🌐 Public
@@ -65,7 +66,7 @@ public class PostController {
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<PostResponse>>updatePost(
             @PathVariable Long id,
-            @RequestBody UpdatePostRequest request,
+            @Valid @RequestBody UpdatePostRequest request,
             @RequestHeader("Authorization") String token
     ) {
         return ResponseEntity.ok(
