@@ -1,0 +1,21 @@
+package com.composetask.mobileapp.vendor.dto;
+
+import lombok.Builder;
+import lombok.Data;
+
+import java.time.LocalDateTime;
+
+@Data
+@Builder
+public class VendorResponse {
+
+    private Long id;
+    private String businessName;
+    private String description;
+    private String category;
+    private String location;
+    private String gstNumber;
+    private boolean verified;
+    private String ownerEmail;
+    private LocalDateTime createdAt;
+}

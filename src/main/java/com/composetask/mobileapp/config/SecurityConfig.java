@@ -50,6 +50,11 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PUT, "/api/posts/**").authenticated()
                         .requestMatchers(HttpMethod.DELETE, "/api/posts/**").authenticated()
 
+                        .requestMatchers(HttpMethod.GET, "/api/vendors/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/vendors/**").authenticated()
+                        .requestMatchers(HttpMethod.PUT, "/api/vendors/**").authenticated()
+                        .requestMatchers(HttpMethod.DELETE, "/api/vendors/**").authenticated()
+
                         // Everything else needs authentication
                         .anyRequest().authenticated()
                 )
