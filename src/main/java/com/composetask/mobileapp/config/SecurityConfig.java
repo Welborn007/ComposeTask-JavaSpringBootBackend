@@ -55,6 +55,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PUT, "/api/vendors/**").authenticated()
                         .requestMatchers(HttpMethod.DELETE, "/api/vendors/**").authenticated()
 
+                        .requestMatchers("/api/verification/**").authenticated()
+
                         // Everything else needs authentication
                         .anyRequest().authenticated()
                 )
