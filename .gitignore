@@ -31,3 +31,14 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Environment Variables & Secrets ###
+.env
+.env.local
+.env.*.local
+*.properties.local
+application.properties.local
+application-prod.properties.local
+
+### IDE Run Configurations with Secrets ###
+.idea/runConfigurations/
