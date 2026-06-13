@@ -7,6 +7,7 @@ import com.composetask.mobileapp.config.JwtUtil;
 import com.composetask.mobileapp.auth.dto.AuthResponse;
 import com.composetask.mobileapp.auth.dto.LoginRequest;
 import com.composetask.mobileapp.auth.dto.SignupRequest;
+import com.composetask.mobileapp.auth.model.RefreshToken;
 import com.composetask.mobileapp.userapi.model.User;
 import com.composetask.mobileapp.userapi.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +21,7 @@ public class AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
+    private final RefreshTokenService refreshTokenService;
 
     public AuthResponse signup(SignupRequest request) {
         if (userRepository.findByEmail(request.getEmail()).isPresent()) {
@@ -32,8 +34,7 @@ public class AuthService {
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         userRepository.save(user);
 
-        String token = jwtUtil.generateToken(user.getEmail());
-        return new AuthResponse(token,"Signup successful" );
+        return generateAuthResponse(user);
     }
 
     public AuthResponse login(LoginRequest request) {
@@ -44,8 +45,28 @@ public class AuthService {
             throw new UnauthorizedException("Invalid password");
         }
 
-        String token = jwtUtil.generateToken(user.getEmail());
-        return new AuthResponse(token,"Login successful");
+        return generateAuthResponse(user);
+    }
+
+    public AuthResponse refreshAccessToken(String refreshTokenString) {
+        RefreshToken refreshToken = refreshTokenService.validateRefreshToken(refreshTokenString);
+        User user = refreshToken.getUser();
+
+        String accessToken = jwtUtil.generateAccessToken(user.getEmail());
+        long expiresIn = jwtUtil.getAccessTokenExpirationSeconds();
+
+        return new AuthResponse(accessToken, "Token refreshed successfully", refreshTokenString, expiresIn);
+    }
+
+    public void logout(String refreshTokenString) {
+        refreshTokenService.revokeRefreshToken(refreshTokenString);
+    }
+
+    private AuthResponse generateAuthResponse(User user) {
+        String accessToken = jwtUtil.generateAccessToken(user.getEmail());
+        RefreshToken refreshToken = refreshTokenService.createRefreshToken(user);
+        long expiresIn = jwtUtil.getAccessTokenExpirationSeconds();
+
+        return new AuthResponse(accessToken, "Authentication successful", refreshToken.getToken(), expiresIn);
     }
 }
-

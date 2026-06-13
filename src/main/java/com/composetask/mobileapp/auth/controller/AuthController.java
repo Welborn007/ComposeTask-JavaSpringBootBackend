@@ -2,6 +2,8 @@ package com.composetask.mobileapp.auth.controller;
 
 import com.composetask.mobileapp.auth.dto.AuthResponse;
 import com.composetask.mobileapp.auth.dto.LoginRequest;
+import com.composetask.mobileapp.auth.dto.RefreshTokenRequest;
+import com.composetask.mobileapp.auth.dto.LogoutRequest;
 import com.composetask.mobileapp.auth.dto.SignupRequest;
 import com.composetask.mobileapp.auth.service.AuthService;
 import com.composetask.mobileapp.common.dto.ApiResponse;
@@ -36,6 +38,26 @@ public class AuthController {
                         authService.login(request),
                         "Login successful"
                 )
+        );
+    }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<ApiResponse<AuthResponse>> refresh(
+            @Valid @RequestBody RefreshTokenRequest request
+    ) {
+        AuthResponse response = authService.refreshAccessToken(request.getRefreshToken());
+        return ResponseEntity.ok(
+                ApiResponse.success(response, "Access token refreshed successfully")
+        );
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<ApiResponse<Void>> logout(
+            @Valid @RequestBody LogoutRequest request
+    ) {
+        authService.logout(request.getRefreshToken());
+        return ResponseEntity.ok(
+                ApiResponse.success(null, "Logout successful")
         );
     }
 }

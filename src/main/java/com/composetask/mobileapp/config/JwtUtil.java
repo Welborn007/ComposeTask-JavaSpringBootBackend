@@ -16,17 +16,29 @@ public class JwtUtil {
     @Value("${jwt.secret:this_is_a_secret_key_for_demo_purpose_please_change_it}")
     private String SECRET_KEY;
 
-    private final long EXPIRATION_TIME = 86400000; // 1 day in ms
+    @Value("${jwt.expiration:900000}")  // 15 minutes in ms
+    private long ACCESS_TOKEN_EXPIRATION;
+
+    @Value("${jwt.refresh.expiration:604800000}")  // 7 days in ms
+    private long REFRESH_TOKEN_EXPIRATION;
 
     private Key getSigningKey() {
         return Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
     }
 
-    public String generateToken(String email) {
+    public String generateAccessToken(String email) {
+        return generateToken(email, ACCESS_TOKEN_EXPIRATION);
+    }
+
+    public String generateRefreshToken(String email) {
+        return generateToken(email, REFRESH_TOKEN_EXPIRATION);
+    }
+
+    private String generateToken(String email, long expirationTime) {
         return Jwts.builder()
                 .setSubject(email)
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
+                .setExpiration(new Date(System.currentTimeMillis() + expirationTime))
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
@@ -47,5 +59,9 @@ public class JwtUtil {
         } catch (JwtException e) {
             return false;
         }
+    }
+
+    public long getAccessTokenExpirationSeconds() {
+        return ACCESS_TOKEN_EXPIRATION / 1000;
     }
 }
