@@ -114,10 +114,11 @@
             <artifactId>jackson-datatype-jsr310</artifactId>
         </dependency>
 
-		<!-- Flyway for database migrations -->
+		<!-- Flyway for database migrations (pinned compatible version) -->
 		<dependency>
 			<groupId>org.flywaydb</groupId>
 			<artifactId>flyway-core</artifactId>
+			<version>9.16.3</version>
 		</dependency>
 
     </dependencies>

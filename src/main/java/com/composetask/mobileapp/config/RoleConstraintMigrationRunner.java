@@ -8,6 +8,7 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
+import org.springframework.beans.factory.annotation.Value;
 
 /**
  * Small application runner that applies a safe ALTER TABLE migration to extend the
@@ -21,15 +22,22 @@ public class RoleConstraintMigrationRunner implements ApplicationRunner {
     private static final Logger log = LoggerFactory.getLogger(RoleConstraintMigrationRunner.class);
 
     private final JdbcTemplate jdbcTemplate;
+    private final boolean flywayEnabled;
 
     @Autowired
-    public RoleConstraintMigrationRunner(JdbcTemplate jdbcTemplate) {
+    public RoleConstraintMigrationRunner(JdbcTemplate jdbcTemplate, @Value("${spring.flyway.enabled:false}") boolean flywayEnabled) {
         this.jdbcTemplate = jdbcTemplate;
+        this.flywayEnabled = flywayEnabled;
     }
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
-        log.info("RoleConstraintMigrationRunner: applying role constraint migration (if needed)");
+        log.info("RoleConstraintMigrationRunner: starting (app.migration.apply-role-constraint=true)");
+
+        if (flywayEnabled) {
+            log.info("RoleConstraintMigrationRunner: skipping because Flyway is enabled (spring.flyway.enabled=true)");
+            return;
+        }
 
         try {
             // Drop existing constraint if present and recreate allowing VENDOR and CUSTOMER
@@ -42,7 +50,7 @@ public class RoleConstraintMigrationRunner implements ApplicationRunner {
             log.info("RoleConstraintMigrationRunner: applied users_role_check constraint to include VENDOR and CUSTOMER");
         } catch (Exception ex) {
             log.error("RoleConstraintMigrationRunner: failed to apply constraint migration", ex);
-            // Re-throwing would stop the app; log and continue so the application can start.
+            // Do not re-throw: allow application to start even if this runner fails
         }
     }
 }
