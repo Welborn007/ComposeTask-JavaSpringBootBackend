@@ -4,7 +4,9 @@ public class Constants {
 
     public enum Role {
         USER,
-        ADMIN
+        ADMIN,
+        VENDOR,
+        CUSTOMER
     }
 
 }

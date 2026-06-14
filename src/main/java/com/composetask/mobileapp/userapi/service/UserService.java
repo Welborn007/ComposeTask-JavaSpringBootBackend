@@ -21,11 +21,7 @@ public class UserService {
     public List<UserResponse> getAllUsers() {
         return userRepository.findAll()
                 .stream()
-                .map(user -> new UserResponse(
-                        user.getId(),
-                        user.getName(),
-                        user.getEmail()
-                ))
+                .map(this::mapToUserResponse)
                 .toList();
     }
 
@@ -56,12 +52,29 @@ public class UserService {
         userRepository.deleteById(id);
     }
 
+    // ✅ Update user role (admin only)
+    public UserResponse updateUserRole(Long id, String roleName) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        try {
+            com.composetask.mobileapp.Constants.Role role = com.composetask.mobileapp.Constants.Role.valueOf(roleName);
+            user.setRole(role);
+        } catch (IllegalArgumentException ex) {
+            throw new IllegalArgumentException("Invalid role: " + roleName);
+        }
+
+        User saved = userRepository.save(user);
+        return mapToUserResponse(saved);
+    }
+
     // 🔁 Mapper (private)
     private UserResponse mapToUserResponse(User user) {
         return new UserResponse(
                 user.getId(),
                 user.getName(),
-                user.getEmail()
+                user.getEmail(),
+                user.getRole() != null ? user.getRole().name() : null
         );
     }
 }

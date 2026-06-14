@@ -9,6 +9,7 @@ import com.composetask.mobileapp.auth.dto.LoginRequest;
 import com.composetask.mobileapp.auth.dto.SignupRequest;
 import com.composetask.mobileapp.auth.model.RefreshToken;
 import com.composetask.mobileapp.userapi.model.User;
+import com.composetask.mobileapp.Constants;
 import com.composetask.mobileapp.userapi.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -32,6 +33,17 @@ public class AuthService {
         user.setName(request.getName());
         user.setEmail(request.getEmail());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
+        // set role from request (VENDOR or CUSTOMER). Do not allow ADMIN signup.
+        try {
+            Constants.Role role = Constants.Role.valueOf(request.getRole());
+            if (role == Constants.Role.ADMIN) {
+                throw new BadRequestException("Cannot signup as ADMIN");
+            }
+            user.setRole(role);
+        } catch (IllegalArgumentException ex) {
+            throw new BadRequestException("Invalid role specified");
+        }
+
         userRepository.save(user);
 
         return generateAuthResponse(user);

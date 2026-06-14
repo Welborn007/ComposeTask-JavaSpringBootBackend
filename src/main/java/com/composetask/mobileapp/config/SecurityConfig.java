@@ -38,7 +38,9 @@ public class SecurityConfig {
                         // Public
                         .requestMatchers("/api/auth/**").permitAll()
 
-                        //Secure for users
+                        // Secure user endpoints
+                        // Admins can update user roles
+                        .requestMatchers(HttpMethod.PUT, "/api/users/*/role").hasRole("ADMIN")
                         .requestMatchers("/api/users/**").authenticated()
 
                         // Public GET for posts
@@ -50,12 +52,23 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PUT, "/api/posts/**").authenticated()
                         .requestMatchers(HttpMethod.DELETE, "/api/posts/**").authenticated()
 
-                        .requestMatchers(HttpMethod.GET, "/api/vendors/**").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/vendors/**").authenticated()
-                        .requestMatchers(HttpMethod.PUT, "/api/vendors/**").authenticated()
-                        .requestMatchers(HttpMethod.DELETE, "/api/vendors/**").authenticated()
+                        // Vendor endpoints
+                        // VENDOR role may manage their own vendors
+                        .requestMatchers(HttpMethod.GET, "/api/vendors/my").hasRole("VENDOR")
+                        // Customers (and admins/vendors) can view/search vendors
+                        .requestMatchers(HttpMethod.GET, "/api/vendors/**").hasAnyRole("CUSTOMER","VENDOR","ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/vendors/**").hasRole("VENDOR")
+                        .requestMatchers(HttpMethod.PUT, "/api/vendors/**").hasRole("VENDOR")
+                        .requestMatchers(HttpMethod.DELETE, "/api/vendors/**").hasRole("VENDOR")
 
-                        .requestMatchers("/api/verification/**").authenticated()
+                        // Verification endpoints
+                        // Vendors submit verification requests
+                        .requestMatchers(HttpMethod.POST, "/api/verification/**").hasRole("VENDOR")
+                        // Vendors and admins can view verification requests
+                        .requestMatchers(HttpMethod.GET, "/api/verification/**").hasAnyRole("VENDOR","ADMIN")
+                        // Only ADMIN can approve/reject
+                        .requestMatchers(HttpMethod.PUT, "/api/verification/*/approve").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/verification/*/reject").hasRole("ADMIN")
 
                         // Everything else needs authentication
                         .anyRequest().authenticated()
