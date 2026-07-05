@@ -46,7 +46,7 @@ public class ReviewService {
         }
 
         // Prevent duplicate reviews by same customer for same vendor
-        boolean already = reviewRepository.hasCustomerReviewedVendor(vendor.getId(), user.getId());
+        boolean already = reviewRepository.countReviewsByCustomerForVendor(vendor.getId(), user.getId()) > 0;
         if (already) {
             throw new BadRequestException("Customer has already reviewed this vendor");
         }

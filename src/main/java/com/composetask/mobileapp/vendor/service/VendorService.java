@@ -3,6 +3,7 @@ package com.composetask.mobileapp.vendor.service;
 import com.composetask.mobileapp.common.dto.PageResponse;
 import com.composetask.mobileapp.common.exception.UnauthorizedException;
 import com.composetask.mobileapp.config.JwtUtil;
+import com.composetask.mobileapp.review.service.TrustScoreService;
 import com.composetask.mobileapp.userapi.model.User;
 import com.composetask.mobileapp.userapi.repository.UserRepository;
 import com.composetask.mobileapp.vendor.dto.CreateVendorRequest;
@@ -27,6 +28,7 @@ public class VendorService {
     private final VendorRepository vendorRepository;
     private final UserRepository userRepository;
     private final JwtUtil jwtUtil;
+    private final TrustScoreService trustScoreService;
 
     // CREATE
     public VendorResponse createVendor(CreateVendorRequest request, String token) {
@@ -136,6 +138,9 @@ public class VendorService {
     }
 
     private VendorResponse mapToResponse(Vendor vendor) {
+        Double avgRating = trustScoreService.getAverageRating(vendor.getId());
+        Long totalReviews = trustScoreService.getTotalReviewCount(vendor.getId());
+
         return VendorResponse.builder()
                 .id(vendor.getId())
                 .businessName(vendor.getBusinessName())
@@ -146,6 +151,8 @@ public class VendorService {
                 .verified(vendor.isVerified())
                 .ownerEmail(vendor.getUser().getEmail())
                 .createdAt(vendor.getCreatedAt())
+                .averageRating(avgRating)
+                .totalReviews(totalReviews)
                 .build();
     }
 }

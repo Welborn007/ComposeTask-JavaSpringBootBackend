@@ -18,4 +18,8 @@ public class VendorResponse {
     private boolean verified;
     private String ownerEmail;
     private LocalDateTime createdAt;
+
+    // Trust score fields
+    private Double averageRating;    // 0-5 stars
+    private Long totalReviews;       // Total number of reviews
 }

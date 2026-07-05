@@ -52,7 +52,8 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
 
     /**
      * Check if a customer has already reviewed a vendor (to prevent duplicates).
+     * Returns count; service checks if result > 0.
      */
-    @Query("SELECT COUNT(r) > 0 FROM Review r WHERE r.vendor.id = :vendorId AND r.customer.id = :customerId")
-    boolean hasCustomerReviewedVendor(@Param("vendorId") Long vendorId, @Param("customerId") Long customerId);
+    @Query("SELECT COUNT(r) FROM Review r WHERE r.vendor.id = :vendorId AND r.customer.id = :customerId")
+    Long countReviewsByCustomerForVendor(@Param("vendorId") Long vendorId, @Param("customerId") Long customerId);
 }

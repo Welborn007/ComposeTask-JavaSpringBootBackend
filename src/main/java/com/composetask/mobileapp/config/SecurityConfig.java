@@ -79,6 +79,9 @@ public class SecurityConfig {
                         // Customers or Admins can delete (service enforces ownership unless admin)
                         .requestMatchers(HttpMethod.DELETE, "/api/reviews/**").hasAnyRole("CUSTOMER","ADMIN")
 
+                        // Trust Score endpoints (public - anyone can view vendor ratings)
+                        .requestMatchers(HttpMethod.GET, "/api/trust-score/**").permitAll()
+
                         // Everything else needs authentication
                         .anyRequest().authenticated()
                 )
