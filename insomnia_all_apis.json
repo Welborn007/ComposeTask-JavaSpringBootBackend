@@ -1,0 +1,367 @@
+{
+  "_type": "export",
+  "__export_format": 4,
+  "__export_date": "2024-05-15T12:00:00.000Z",
+  "__export_source": "insomnia.desktop.app:v2023.5.8",
+  "resources": [
+    {
+      "_id": "wrk_1",
+      "_type": "workspace",
+      "name": "ComposeTask API",
+      "description": "",
+      "scope": "collection"
+    },
+    {
+      "_id": "fld_auth",
+      "_type": "request_group",
+      "parentId": "wrk_1",
+      "name": "Auth"
+    },
+    {
+      "_id": "req_signup",
+      "_type": "request",
+      "parentId": "fld_auth",
+      "name": "Signup",
+      "url": "{{ _.baseUrl }}/api/auth/signup",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n\t\"name\": \"Test User\",\n\t\"email\": \"test@example.com\",\n\t\"password\": \"password123\",\n\t\"role\": \"CUSTOMER\"\n}"
+      },
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" }
+      ]
+    },
+    {
+      "_id": "req_login",
+      "_type": "request",
+      "parentId": "fld_auth",
+      "name": "Login",
+      "url": "{{ _.baseUrl }}/api/auth/login",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n\t\"email\": \"test@example.com\",\n\t\"password\": \"password123\"\n}"
+      },
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" }
+      ]
+    },
+    {
+      "_id": "req_refresh",
+      "_type": "request",
+      "parentId": "fld_auth",
+      "name": "Refresh Token",
+      "url": "{{ _.baseUrl }}/api/auth/refresh",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n\t\"refreshToken\": \"your_refresh_token_here\"\n}"
+      },
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" }
+      ]
+    },
+    {
+      "_id": "req_logout",
+      "_type": "request",
+      "parentId": "fld_auth",
+      "name": "Logout",
+      "url": "{{ _.baseUrl }}/api/auth/logout",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n\t\"refreshToken\": \"your_refresh_token_here\"\n}"
+      },
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" }
+      ]
+    },
+    {
+      "_id": "fld_posts",
+      "_type": "request_group",
+      "parentId": "wrk_1",
+      "name": "Posts"
+    },
+    {
+      "_id": "req_create_post",
+      "_type": "request",
+      "parentId": "fld_posts",
+      "name": "Create Post",
+      "url": "{{ _.baseUrl }}/api/posts",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n\t\"title\": \"My New Post\",\n\t\"content\": \"This is the content of my new post.\"\n}"
+      },
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" },
+        { "name": "Authorization", "value": "Bearer {{ _.token }}" }
+      ]
+    },
+    {
+      "_id": "req_get_all_posts",
+      "_type": "request",
+      "parentId": "fld_posts",
+      "name": "Get All Posts",
+      "url": "{{ _.baseUrl }}/api/posts",
+      "method": "GET",
+      "headers": []
+    },
+    {
+      "_id": "req_get_my_posts",
+      "_type": "request",
+      "parentId": "fld_posts",
+      "name": "Get My Posts",
+      "url": "{{ _.baseUrl }}/api/posts/my",
+      "method": "GET",
+      "headers": [
+        { "name": "Authorization", "value": "Bearer {{ _.token }}" }
+      ]
+    },
+    {
+      "_id": "req_update_post",
+      "_type": "request",
+      "parentId": "fld_posts",
+      "name": "Update Post",
+      "url": "{{ _.baseUrl }}/api/posts/1",
+      "method": "PUT",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n\t\"title\": \"Updated Post Title\",\n\t\"content\": \"Updated content.\"\n}"
+      },
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" },
+        { "name": "Authorization", "value": "Bearer {{ _.token }}" }
+      ]
+    },
+    {
+      "_id": "req_delete_post",
+      "_type": "request",
+      "parentId": "fld_posts",
+      "name": "Delete Post",
+      "url": "{{ _.baseUrl }}/api/posts/1",
+      "method": "DELETE",
+      "headers": [
+        { "name": "Authorization", "value": "Bearer {{ _.token }}" }
+      ]
+    },
+    {
+      "_id": "fld_users",
+      "_type": "request_group",
+      "parentId": "wrk_1",
+      "name": "Users"
+    },
+    {
+      "_id": "req_get_all_users",
+      "_type": "request",
+      "parentId": "fld_users",
+      "name": "Get All Users",
+      "url": "{{ _.baseUrl }}/api/users",
+      "method": "GET",
+      "headers": [
+        { "name": "Authorization", "value": "Bearer {{ _.token }}" }
+      ]
+    },
+    {
+      "_id": "req_get_user_by_id",
+      "_type": "request",
+      "parentId": "fld_users",
+      "name": "Get User By ID",
+      "url": "{{ _.baseUrl }}/api/users/1",
+      "method": "GET",
+      "headers": [
+        { "name": "Authorization", "value": "Bearer {{ _.token }}" }
+      ]
+    },
+    {
+      "_id": "req_update_user",
+      "_type": "request",
+      "parentId": "fld_users",
+      "name": "Update User",
+      "url": "{{ _.baseUrl }}/api/users/1",
+      "method": "PUT",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n\t\"name\": \"New Name\"\n}"
+      },
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" },
+        { "name": "Authorization", "value": "Bearer {{ _.token }}" }
+      ]
+    },
+    {
+      "_id": "req_update_user_role",
+      "_type": "request",
+      "parentId": "fld_users",
+      "name": "Update User Role",
+      "url": "{{ _.baseUrl }}/api/users/1/role",
+      "method": "PUT",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n\t\"role\": \"ADMIN\"\n}"
+      },
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" },
+        { "name": "Authorization", "value": "Bearer {{ _.token }}" }
+      ]
+    },
+    {
+      "_id": "req_delete_user",
+      "_type": "request",
+      "parentId": "fld_users",
+      "name": "Delete User",
+      "url": "{{ _.baseUrl }}/api/users/1",
+      "method": "DELETE",
+      "headers": [
+        { "name": "Authorization", "value": "Bearer {{ _.token }}" }
+      ]
+    },
+    {
+      "_id": "req_get_me",
+      "_type": "request",
+      "parentId": "fld_users",
+      "name": "Get Me",
+      "url": "{{ _.baseUrl }}/api/users/me",
+      "method": "GET",
+      "headers": [
+        { "name": "Authorization", "value": "Bearer {{ _.token }}" }
+      ]
+    },
+    {
+      "_id": "fld_vendors",
+      "_type": "request_group",
+      "parentId": "wrk_1",
+      "name": "Vendors"
+    },
+    {
+      "_id": "req_create_vendor",
+      "_type": "request",
+      "parentId": "fld_vendors",
+      "name": "Create Vendor",
+      "url": "{{ _.baseUrl }}/api/vendors",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n\t\"businessName\": \"My Awesome Business\",\n\t\"description\": \"We sell awesome things.\"\n}"
+      },
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" },
+        { "name": "Authorization", "value": "Bearer {{ _.token }}" }
+      ]
+    },
+    {
+      "_id": "req_get_all_vendors",
+      "_type": "request",
+      "parentId": "fld_vendors",
+      "name": "Get All Vendors",
+      "url": "{{ _.baseUrl }}/api/vendors",
+      "method": "GET",
+      "headers": []
+    },
+    {
+      "_id": "req_get_my_vendors",
+      "_type": "request",
+      "parentId": "fld_vendors",
+      "name": "Get My Vendors",
+      "url": "{{ _.baseUrl }}/api/vendors/my",
+      "method": "GET",
+      "headers": [
+        { "name": "Authorization", "value": "Bearer {{ _.token }}" }
+      ]
+    },
+    {
+      "_id": "req_update_vendor",
+      "_type": "request",
+      "parentId": "fld_vendors",
+      "name": "Update Vendor",
+      "url": "{{ _.baseUrl }}/api/vendors/1",
+      "method": "PUT",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n\t\"businessName\": \"My Updated Business Name\"\n}"
+      },
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" },
+        { "name": "Authorization", "value": "Bearer {{ _.token }}" }
+      ]
+    },
+    {
+      "_id": "req_delete_vendor",
+      "_type": "request",
+      "parentId": "fld_vendors",
+      "name": "Delete Vendor",
+      "url": "{{ _.baseUrl }}/api/vendors/1",
+      "method": "DELETE",
+      "headers": [
+        { "name": "Authorization", "value": "Bearer {{ _.token }}" }
+      ]
+    },
+    {
+      "_id": "fld_verification",
+      "_type": "request_group",
+      "parentId": "wrk_1",
+      "name": "Verification"
+    },
+    {
+      "_id": "req_submit_verification",
+      "_type": "request",
+      "parentId": "fld_verification",
+      "name": "Submit Verification",
+      "url": "{{ _.baseUrl }}/api/verification/1",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n\t\"documentUrl\": \"https://example.com/document.pdf\"\n}"
+      },
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" },
+        { "name": "Authorization", "value": "Bearer {{ _.token }}" }
+      ]
+    },
+    {
+      "_id": "req_get_verification",
+      "_type": "request",
+      "parentId": "fld_verification",
+      "name": "Get Verification",
+      "url": "{{ _.baseUrl }}/api/verification/1",
+      "method": "GET",
+      "headers": [
+        { "name": "Authorization", "value": "Bearer {{ _.token }}" }
+      ]
+    },
+    {
+      "_id": "req_approve_verification",
+      "_type": "request",
+      "parentId": "fld_verification",
+      "name": "Approve Verification",
+      "url": "{{ _.baseUrl }}/api/verification/1/approve",
+      "method": "PUT",
+      "headers": [
+        { "name": "Authorization", "value": "Bearer {{ _.token }}" }
+      ]
+    },
+    {
+      "_id": "req_reject_verification",
+      "_type": "request",
+      "parentId": "fld_verification",
+      "name": "Reject Verification",
+      "url": "{{ _.baseUrl }}/api/verification/1/reject",
+      "method": "PUT",
+      "headers": [
+        { "name": "Authorization", "value": "Bearer {{ _.token }}" }
+      ]
+    },
+    {
+      "_id": "env_1",
+      "_type": "environment",
+      "parentId": "wrk_1",
+      "name": "Base Environment",
+      "data": {
+        "baseUrl": "http://localhost:8080",
+        "token": "your_jwt_token_here",
+        "refreshToken": "your_refresh_token_here"
+      }
+    }
+  ]
+}

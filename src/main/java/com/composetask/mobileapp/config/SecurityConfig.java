@@ -59,7 +59,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/vendors/**").hasAnyRole("CUSTOMER","VENDOR","ADMIN")
                         .requestMatchers(HttpMethod.POST, "/api/vendors/**").hasRole("VENDOR")
                         .requestMatchers(HttpMethod.PUT, "/api/vendors/**").hasRole("VENDOR")
-                        .requestMatchers(HttpMethod.DELETE, "/api/vendors/**").hasRole("VENDOR")
+                        .requestMatchers(HttpMethod.DELETE, "/api/vendors/**").hasAnyRole("VENDOR", "ADMIN")
 
                         // Verification endpoints
                         // Vendors submit verification requests
@@ -69,6 +69,15 @@ public class SecurityConfig {
                         // Only ADMIN can approve/reject
                         .requestMatchers(HttpMethod.PUT, "/api/verification/*/approve").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/verification/*/reject").hasRole("ADMIN")
+
+                        // Reviews endpoints
+                        // Public can view reviews
+                        .requestMatchers(HttpMethod.GET, "/api/reviews/**").permitAll()
+                        // Only CUSTOMERS can create or update reviews (ownership enforced in service)
+                        .requestMatchers(HttpMethod.POST, "/api/reviews/**").hasRole("CUSTOMER")
+                        .requestMatchers(HttpMethod.PUT, "/api/reviews/**").hasRole("CUSTOMER")
+                        // Customers or Admins can delete (service enforces ownership unless admin)
+                        .requestMatchers(HttpMethod.DELETE, "/api/reviews/**").hasAnyRole("CUSTOMER","ADMIN")
 
                         // Everything else needs authentication
                         .anyRequest().authenticated()

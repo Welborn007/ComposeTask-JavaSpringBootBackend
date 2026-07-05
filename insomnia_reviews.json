@@ -1,0 +1,115 @@
+{
+  "_type": "export",
+  "__export_format": 4,
+  "__export_date": "2024-05-15T10:00:00.000Z",
+  "__export_source": "insomnia.desktop.app:v2023.5.8",
+  "resources": [
+    {
+      "_id": "wrk_1",
+      "_type": "workspace",
+      "name": "ComposeTask Reviews",
+      "description": "",
+      "scope": "collection"
+    },
+    {
+      "_id": "req_1",
+      "_type": "request",
+      "parentId": "wrk_1",
+      "name": "Create Review",
+      "url": "{{ _.baseUrl }}/api/reviews",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n\t\"vendorId\": 1,\n\t\"rating\": 5,\n\t\"comment\": \"Excellent service!\"\n}"
+      },
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ]
+    },
+    {
+      "_id": "req_2",
+      "_type": "request",
+      "parentId": "wrk_1",
+      "name": "Get Reviews by Vendor",
+      "url": "{{ _.baseUrl }}/api/reviews/vendor/1",
+      "method": "GET",
+      "headers": []
+    },
+    {
+      "_id": "req_3",
+      "_type": "request",
+      "parentId": "wrk_1",
+      "name": "Get My Reviews",
+      "url": "{{ _.baseUrl }}/api/reviews/my",
+      "method": "GET",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ]
+    },
+    {
+      "_id": "req_4",
+      "_type": "request",
+      "parentId": "wrk_1",
+      "name": "Get Review by ID",
+      "url": "{{ _.baseUrl }}/api/reviews/1",
+      "method": "GET",
+      "headers": []
+    },
+    {
+      "_id": "req_5",
+      "_type": "request",
+      "parentId": "wrk_1",
+      "name": "Update Review",
+      "url": "{{ _.baseUrl }}/api/reviews/1",
+      "method": "PUT",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n\t\"vendorId\": 1,\n\t\"rating\": 4,\n\t\"comment\": \"Good service, but could be faster.\"\n}"
+      },
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ]
+    },
+    {
+      "_id": "req_6",
+      "_type": "request",
+      "parentId": "wrk_1",
+      "name": "Delete Review",
+      "url": "{{ _.baseUrl }}/api/reviews/1",
+      "method": "DELETE",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ]
+    },
+    {
+      "_id": "env_1",
+      "_type": "environment",
+      "parentId": "wrk_1",
+      "name": "Base Environment",
+      "data": {
+        "baseUrl": "http://localhost:8080",
+        "token": "your_jwt_token_here"
+      }
+    }
+  ]
+}
