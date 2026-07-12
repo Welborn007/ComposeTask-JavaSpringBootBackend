@@ -51,4 +51,6 @@ public interface VendorRepository extends JpaRepository<Vendor, Long>, VendorRep
 
     Page<Vendor> findByUserId(Long userId, Pageable pageable);
 
+    boolean existsByUserId(Long userId);
+
 }

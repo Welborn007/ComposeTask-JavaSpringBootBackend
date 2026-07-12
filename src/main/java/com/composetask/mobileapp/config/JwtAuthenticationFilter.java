@@ -86,9 +86,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
         String path = request.getServletPath();
 
-        // Do NOT apply JWT filter for login/signup
-        return path.startsWith("/api/auth");
+        return path.equals("/api/auth/signup")
+                || path.equals("/api/auth/login")
+                || path.equals("/api/auth/refresh");
     }
 
 }
-

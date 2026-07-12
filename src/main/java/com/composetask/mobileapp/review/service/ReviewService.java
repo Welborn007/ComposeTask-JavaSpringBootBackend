@@ -1,5 +1,6 @@
 package com.composetask.mobileapp.review.service;
 
+import com.composetask.mobileapp.Constants;
 import com.composetask.mobileapp.common.dto.PageResponse;
 import com.composetask.mobileapp.common.exception.UnauthorizedException;
 import com.composetask.mobileapp.common.exception.BadRequestException;
@@ -36,6 +37,10 @@ public class ReviewService {
 
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        if (user.getRole() != Constants.Role.CUSTOMER) {
+            throw new UnauthorizedException("Only customers can create reviews");
+        }
 
         Vendor vendor = vendorRepository.findById(request.getVendorId())
                 .orElseThrow(() -> new ResourceNotFoundException("Vendor not found"));
@@ -88,6 +93,10 @@ public class ReviewService {
         String email = extractEmail(token);
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        if (user.getRole() != Constants.Role.CUSTOMER) {
+            throw new UnauthorizedException("Only customers can update reviews");
+        }
 
         Review review = reviewRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Review not found"));

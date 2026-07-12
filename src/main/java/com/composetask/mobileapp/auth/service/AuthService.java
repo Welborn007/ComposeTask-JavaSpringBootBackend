@@ -33,9 +33,12 @@ public class AuthService {
         user.setName(request.getName());
         user.setEmail(request.getEmail());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
-        // set role from request (VENDOR or CUSTOMER). Do not allow ADMIN signup.
+        // Default public signup to CUSTOMER. Do not allow ADMIN signup.
         try {
-            Constants.Role role = Constants.Role.valueOf(request.getRole());
+            String requestedRole = request.getRole();
+            Constants.Role role = requestedRole == null || requestedRole.isBlank()
+                    ? Constants.Role.CUSTOMER
+                    : Constants.Role.valueOf(requestedRole);
             if (role == Constants.Role.ADMIN) {
                 throw new BadRequestException("Cannot signup as ADMIN");
             }
@@ -64,7 +67,7 @@ public class AuthService {
         RefreshToken refreshToken = refreshTokenService.validateRefreshToken(refreshTokenString);
         User user = refreshToken.getUser();
 
-        String accessToken = jwtUtil.generateAccessToken(user.getEmail());
+        String accessToken = jwtUtil.generateAccessToken(user.getEmail(), user.getRole().name());
         long expiresIn = jwtUtil.getAccessTokenExpirationSeconds();
 
         return new AuthResponse(accessToken, "Token refreshed successfully", refreshTokenString, expiresIn);
@@ -75,7 +78,7 @@ public class AuthService {
     }
 
     private AuthResponse generateAuthResponse(User user) {
-        String accessToken = jwtUtil.generateAccessToken(user.getEmail());
+        String accessToken = jwtUtil.generateAccessToken(user.getEmail(), user.getRole().name());
         RefreshToken refreshToken = refreshTokenService.createRefreshToken(user);
         long expiresIn = jwtUtil.getAccessTokenExpirationSeconds();
 

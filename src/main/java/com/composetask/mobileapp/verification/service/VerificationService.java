@@ -1,7 +1,10 @@
 package com.composetask.mobileapp.verification.service;
 
+import com.composetask.mobileapp.Constants;
 import com.composetask.mobileapp.common.exception.UnauthorizedException;
 import com.composetask.mobileapp.config.JwtUtil;
+import com.composetask.mobileapp.userapi.model.User;
+import com.composetask.mobileapp.userapi.repository.UserRepository;
 import com.composetask.mobileapp.vendor.model.Vendor;
 import com.composetask.mobileapp.vendor.repository.VendorRepository;
 import com.composetask.mobileapp.verification.dto.CreateVerificationRequest;
@@ -22,6 +25,7 @@ public class VerificationService {
 
     private final VerificationRepository verificationRepository;
     private final VendorRepository vendorRepository;
+    private final UserRepository userRepository;
     private final JwtUtil jwtUtil;
 
     // 📌 Submit document
@@ -52,7 +56,21 @@ public class VerificationService {
     }
 
     // 📌 Get vendor verification
-    public List<VerificationResponse> getVendorVerification(Long vendorId) {
+    public List<VerificationResponse> getVendorVerification(Long vendorId, String token) {
+        String email = extractEmail(token);
+
+        Vendor vendor = vendorRepository.findById(vendorId)
+                .orElseThrow(() -> new RuntimeException("Vendor not found"));
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        boolean isAdmin = user.getRole() == Constants.Role.ADMIN;
+        boolean isOwner = vendor.getUser().getEmail().equals(email);
+
+        if (!isAdmin && !isOwner) {
+            throw new UnauthorizedException("Not your vendor");
+        }
 
         return verificationRepository.findByVendorId(vendorId)
                 .stream()
@@ -65,6 +83,7 @@ public class VerificationService {
     public VerificationResponse approve(Long id, String token) {
 
         String email = extractEmail(token);
+        assertAdmin(email);
 
         Verification verification = verificationRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Verification not found"));
@@ -80,13 +99,16 @@ public class VerificationService {
     }
 
     // 📌 Reject
-    public VerificationResponse reject(Long id) {
+    public VerificationResponse reject(Long id, String token) {
+        String email = extractEmail(token);
+        assertAdmin(email);
 
         Verification verification = verificationRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Verification not found"));
 
         verification.setStatus(VerificationStatus.REJECTED);
         verification.setReviewedAt(LocalDateTime.now());
+        verification.setReviewedBy(email);
 
         return mapToResponse(verificationRepository.save(verification));
     }
@@ -97,6 +119,15 @@ public class VerificationService {
             throw new UnauthorizedException("Invalid token");
         }
         return jwtUtil.extractEmail(token.substring(7));
+    }
+
+    private void assertAdmin(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (user.getRole() != Constants.Role.ADMIN) {
+            throw new UnauthorizedException("Only admins can review verification requests");
+        }
     }
 
     private VerificationResponse mapToResponse(Verification v) {
@@ -111,4 +142,3 @@ public class VerificationService {
                 .build();
     }
 }
-

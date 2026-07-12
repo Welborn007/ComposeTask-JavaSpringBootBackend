@@ -34,11 +34,12 @@ public class VerificationController {
 
     @GetMapping("/{vendorId}")
     public ResponseEntity<ApiResponse<List<VerificationResponse>>> get(
-            @PathVariable Long vendorId
+            @PathVariable Long vendorId,
+            @RequestHeader("Authorization") String token
     ) {
         return ResponseEntity.ok(
                 ApiResponse.success(
-                        verificationService.getVendorVerification(vendorId),
+                        verificationService.getVendorVerification(vendorId, token),
                         "Verification fetched"
                 )
         );
@@ -58,13 +59,15 @@ public class VerificationController {
     }
 
     @PutMapping("/{id}/reject")
-    public ResponseEntity<ApiResponse<VerificationResponse>> reject(@PathVariable Long id) {
+    public ResponseEntity<ApiResponse<VerificationResponse>> reject(
+            @PathVariable Long id,
+            @RequestHeader("Authorization") String token
+    ) {
         return ResponseEntity.ok(
                 ApiResponse.success(
-                        verificationService.reject(id),
+                        verificationService.reject(id, token),
                         "Rejected"
                 )
         );
     }
 }
-

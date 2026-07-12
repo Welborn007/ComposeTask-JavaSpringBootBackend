@@ -1,6 +1,8 @@
 package com.composetask.mobileapp.vendor.service;
 
+import com.composetask.mobileapp.Constants;
 import com.composetask.mobileapp.common.dto.PageResponse;
+import com.composetask.mobileapp.common.exception.BadRequestException;
 import com.composetask.mobileapp.common.exception.UnauthorizedException;
 import com.composetask.mobileapp.config.JwtUtil;
 import com.composetask.mobileapp.review.service.TrustScoreService;
@@ -37,6 +39,14 @@ public class VendorService {
 
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (user.getRole() != Constants.Role.VENDOR) {
+            throw new UnauthorizedException("Only vendors can create vendor profiles");
+        }
+
+        if (vendorRepository.existsByUserId(user.getId())) {
+            throw new BadRequestException("Vendor profile already exists for this user");
+        }
 
         Vendor vendor = Vendor.builder()
                 .businessName(request.getBusinessName())
@@ -125,7 +135,10 @@ public class VendorService {
         Vendor vendor = vendorRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Vendor not found"));
 
-        if (!vendor.getUser().getEmail().equals(email)) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (user.getRole() != Constants.Role.ADMIN && !vendor.getUser().getEmail().equals(email)) {
             throw new UnauthorizedException("You are not allowed to delete this vendor");
         }
 

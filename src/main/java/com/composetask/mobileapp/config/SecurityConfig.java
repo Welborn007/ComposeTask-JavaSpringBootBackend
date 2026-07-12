@@ -35,13 +35,19 @@ public class SecurityConfig {
                                 "/v3/api-docs/**"
                         ).permitAll()
 
-                        // Public
-                        .requestMatchers("/api/auth/**").permitAll()
+                        // Auth
+                        .requestMatchers(HttpMethod.POST, "/api/auth/signup").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/auth/refresh").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/auth/logout").authenticated()
 
-                        // Secure user endpoints
-                        // Admins can update user roles
+                        // Users
+                        .requestMatchers(HttpMethod.GET, "/api/users/me").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/users").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/users/*/role").hasRole("ADMIN")
-                        .requestMatchers("/api/users/**").authenticated()
+                        .requestMatchers(HttpMethod.DELETE, "/api/users/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/users/*").authenticated()
+                        .requestMatchers(HttpMethod.PUT, "/api/users/*").authenticated()
 
                         // Public GET for posts
                         .requestMatchers(HttpMethod.GET, "/api/posts/**").permitAll()
@@ -71,8 +77,10 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PUT, "/api/verification/*/reject").hasRole("ADMIN")
 
                         // Reviews endpoints
+                        .requestMatchers(HttpMethod.GET, "/api/reviews/my").hasRole("CUSTOMER")
                         // Public can view reviews
-                        .requestMatchers(HttpMethod.GET, "/api/reviews/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/reviews/vendor/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/reviews/*").permitAll()
                         // Only CUSTOMERS can create or update reviews (ownership enforced in service)
                         .requestMatchers(HttpMethod.POST, "/api/reviews/**").hasRole("CUSTOMER")
                         .requestMatchers(HttpMethod.PUT, "/api/reviews/**").hasRole("CUSTOMER")

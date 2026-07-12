@@ -1,6 +1,8 @@
 package com.composetask.mobileapp.userapi.service;
 
+import com.composetask.mobileapp.Constants;
 import com.composetask.mobileapp.common.exception.ResourceNotFoundException;
+import com.composetask.mobileapp.common.exception.UnauthorizedException;
 import com.composetask.mobileapp.userapi.dto.UpdateUserRequest;
 import com.composetask.mobileapp.userapi.dto.UserResponse;
 import com.composetask.mobileapp.userapi.model.User;
@@ -25,18 +27,20 @@ public class UserService {
                 .toList();
     }
 
-    public UserResponse getUserById(Long id) {
+    public UserResponse getUserById(Long id, String requesterEmail) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
+        assertSelfOrAdmin(user, requesterEmail);
         return mapToUserResponse(user);
     }
 
     // ✅ Update user
-    public UserResponse updateUser(Long id, UpdateUserRequest request) {
+    public UserResponse updateUser(Long id, UpdateUserRequest request, String requesterEmail) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
+        assertSelfOrAdmin(user, requesterEmail);
         user.setName(request.getName());
         user.setEmail(request.getEmail());
 
@@ -58,7 +62,7 @@ public class UserService {
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         try {
-            com.composetask.mobileapp.Constants.Role role = com.composetask.mobileapp.Constants.Role.valueOf(roleName);
+            Constants.Role role = Constants.Role.valueOf(roleName);
             user.setRole(role);
         } catch (IllegalArgumentException ex) {
             throw new IllegalArgumentException("Invalid role: " + roleName);
@@ -66,6 +70,18 @@ public class UserService {
 
         User saved = userRepository.save(user);
         return mapToUserResponse(saved);
+    }
+
+    private void assertSelfOrAdmin(User targetUser, String requesterEmail) {
+        User requester = userRepository.findByEmail(requesterEmail)
+                .orElseThrow(() -> new ResourceNotFoundException("Authenticated user not found"));
+
+        boolean isSelf = targetUser.getId().equals(requester.getId());
+        boolean isAdmin = requester.getRole() == Constants.Role.ADMIN;
+
+        if (!isSelf && !isAdmin) {
+            throw new UnauthorizedException("You are not allowed to access this user");
+        }
     }
 
     // 🔁 Mapper (private)

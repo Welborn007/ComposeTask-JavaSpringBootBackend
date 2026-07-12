@@ -1,6 +1,7 @@
 package com.composetask.mobileapp.config;
 
 import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
@@ -30,13 +31,27 @@ public class JwtUtil {
         return generateToken(email, ACCESS_TOKEN_EXPIRATION);
     }
 
+    public String generateAccessToken(String email, String role) {
+        return generateToken(email, role, ACCESS_TOKEN_EXPIRATION);
+    }
+
     public String generateRefreshToken(String email) {
         return generateToken(email, REFRESH_TOKEN_EXPIRATION);
     }
 
     private String generateToken(String email, long expirationTime) {
-        return Jwts.builder()
-                .setSubject(email)
+        return generateToken(email, null, expirationTime);
+    }
+
+    private String generateToken(String email, String role, long expirationTime) {
+        var builder = Jwts.builder()
+                .setSubject(email);
+
+        if (role != null && !role.isBlank()) {
+            builder.claim("role", role);
+        }
+
+        return builder
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + expirationTime))
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)
@@ -44,12 +59,20 @@ public class JwtUtil {
     }
 
     public String extractEmail(String token) {
+        return extractClaims(token)
+                .getSubject();
+    }
+
+    public String extractRole(String token) {
+        return extractClaims(token).get("role", String.class);
+    }
+
+    private Claims extractClaims(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(getSigningKey())
                 .build()
                 .parseClaimsJws(token)
-                .getBody()
-                .getSubject();
+                .getBody();
     }
 
     public boolean isTokenValid(String token) {
