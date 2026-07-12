@@ -50,9 +50,37 @@ public class VendorService {
         return mapToResponse(vendorRepository.save(vendor));
     }
 
-    // GET ALL
-    public PageResponse<VendorResponse> getAllVendors(Pageable pageable) {
-        Page<Vendor> page = vendorRepository.findAll(pageable);
+    // GET ALL / SEARCH
+    public PageResponse<VendorResponse> getAllVendors(
+            String search,
+            String q,
+            String category,
+            String city,
+            String location,
+            Boolean verified,
+            Double minRating,
+            Double minTrustScore,
+            Pageable pageable
+    ) {
+        String searchTerm = normalizeLower(search);
+        if (searchTerm.isEmpty()) {
+            searchTerm = normalizeLower(q);
+        }
+
+        String locationFilter = normalizeLower(city);
+        if (locationFilter.isEmpty()) {
+            locationFilter = normalizeLower(location);
+        }
+
+        Page<Vendor> page = vendorRepository.searchVendors(
+                searchTerm.isEmpty() ? "" : searchTerm,
+                normalizeLower(category),
+                locationFilter.isEmpty() ? "" : locationFilter,
+                verified,
+                minRating,
+                minTrustScore,
+                pageable
+        );
 
         List<VendorResponse> content = page.getContent()
                 .stream()
@@ -136,6 +164,18 @@ public class VendorService {
         }
         return jwtUtil.extractEmail(token.substring(7));
     }
+
+    private String normalize(String value) {
+         if (value == null || value.isBlank()) {
+             return "";
+         }
+         return value.trim();
+     }
+
+     private String normalizeLower(String value) {
+         String normalized = normalize(value);
+         return normalized.isEmpty() ? "" : normalized.toLowerCase();
+     }
 
     private VendorResponse mapToResponse(Vendor vendor) {
         Double avgRating = trustScoreService.getAverageRating(vendor.getId());

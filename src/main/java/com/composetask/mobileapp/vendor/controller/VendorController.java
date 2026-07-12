@@ -37,11 +37,29 @@ public class VendorController {
 
     @GetMapping
     public ResponseEntity<ApiResponse<PageResponse<VendorResponse>>> getAllVendors(
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) String q,
+            @RequestParam(required = false) String category,
+            @RequestParam(required = false) String city,
+            @RequestParam(required = false) String location,
+            @RequestParam(required = false) Boolean verified,
+            @RequestParam(required = false) Double minRating,
+            @RequestParam(required = false) Double minTrustScore,
             Pageable pageable
     ) {
         return ResponseEntity.ok(
                 ApiResponse.success(
-                        vendorService.getAllVendors(pageable),
+                        vendorService.getAllVendors(
+                                search,
+                                q,
+                                category,
+                                city,
+                                location,
+                                verified,
+                                minRating,
+                                minTrustScore,
+                                pageable
+                        ),
                         "Vendors fetched successfully"
                 )
         );
