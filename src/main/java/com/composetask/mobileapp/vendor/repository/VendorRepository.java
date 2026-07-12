@@ -11,7 +11,7 @@ import org.springframework.data.repository.query.Param;
 /**
  * Placeholder repository for vendor persistence operations.
  */
-public interface VendorRepository extends JpaRepository<Vendor, Long> {
+public interface VendorRepository extends JpaRepository<Vendor, Long>, VendorRepositoryCustom {
 
     @EntityGraph(attributePaths = "user")
     @Query("""

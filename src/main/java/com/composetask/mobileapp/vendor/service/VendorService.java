@@ -72,7 +72,7 @@ public class VendorService {
             locationFilter = normalizeLower(location);
         }
 
-        Page<Vendor> page = vendorRepository.searchVendors(
+        Page<Vendor> page = vendorRepository.searchVendorsCustom(
                 searchTerm.isEmpty() ? "" : searchTerm,
                 normalizeLower(category),
                 locationFilter.isEmpty() ? "" : locationFilter,
