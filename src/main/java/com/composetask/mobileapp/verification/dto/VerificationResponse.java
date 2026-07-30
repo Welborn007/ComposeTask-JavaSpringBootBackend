@@ -5,12 +5,13 @@ import lombok.Builder;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Data
 @Builder
 public class VerificationResponse {
 
-    private Long id;
+    private UUID id;
     private String documentType;
     private String documentUrl;
     private VerificationStatus status;
@@ -18,4 +19,3 @@ public class VerificationResponse {
     private LocalDateTime reviewedAt;
     private LocalDateTime createdAt;
 }
-

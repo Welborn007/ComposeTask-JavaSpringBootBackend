@@ -20,6 +20,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -67,13 +68,13 @@ public class ReviewService {
         return mapToResponse(reviewRepository.save(review));
     }
 
-    public PageResponse<ReviewResponse> getReviewsByVendor(Long vendorId, Pageable pageable) {
+    public PageResponse<ReviewResponse> getReviewsByVendor(UUID vendorId, Pageable pageable) {
         Page<Review> page = reviewRepository.findByVendorId(vendorId, pageable);
         List<ReviewResponse> content = page.getContent().stream().map(this::mapToResponse).toList();
         return new PageResponse<>(content, page.getNumber(), page.getSize(), page.getTotalElements(), page.getTotalPages(), page.isLast());
     }
 
-    public ReviewResponse getReviewById(Long id) {
+    public ReviewResponse getReviewById(UUID id) {
         Review review = reviewRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Review not found"));
         return mapToResponse(review);
@@ -89,7 +90,7 @@ public class ReviewService {
         return new PageResponse<>(content, page.getNumber(), page.getSize(), page.getTotalElements(), page.getTotalPages(), page.isLast());
     }
 
-    public ReviewResponse updateReview(Long id, ReviewRequest request, String token) {
+    public ReviewResponse updateReview(UUID id, ReviewRequest request, String token) {
         String email = extractEmail(token);
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
@@ -112,7 +113,7 @@ public class ReviewService {
         return mapToResponse(reviewRepository.save(review));
     }
 
-    public void deleteReview(Long id, String token) {
+    public void deleteReview(UUID id, String token) {
         String email = extractEmail(token);
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
@@ -129,7 +130,7 @@ public class ReviewService {
         reviewRepository.deleteById(id);
     }
 
-    public Double getAverageRating(Long vendorId) {
+    public Double getAverageRating(UUID vendorId) {
         Double avg = reviewRepository.getAverageRatingForVendor(vendorId);
         return avg == null ? 0.0 : avg;
     }

@@ -8,6 +8,8 @@ import com.composetask.mobileapp.vendor.repository.VendorRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
+
 /**
  * Service to calculate trust score for vendors based on reviews.
  */
@@ -22,7 +24,7 @@ public class TrustScoreService {
      * Get trust score for a vendor.
      * Includes: average rating, total review count, verification status, and computed score.
      */
-    public TrustScoreResponse getTrustScore(Long vendorId) {
+    public TrustScoreResponse getTrustScore(UUID vendorId) {
         Vendor vendor = vendorRepository.findById(vendorId)
                 .orElseThrow(() -> new ResourceNotFoundException("Vendor not found"));
 
@@ -53,7 +55,7 @@ public class TrustScoreService {
     /**
      * Get average rating for a vendor (helper method).
      */
-    public Double getAverageRating(Long vendorId) {
+    public Double getAverageRating(UUID vendorId) {
         Double avg = reviewRepository.getAverageRatingForVendor(vendorId);
         return avg == null ? 0.0 : Math.round(avg * 100.0) / 100.0;
     }
@@ -61,9 +63,8 @@ public class TrustScoreService {
     /**
      * Get total review count for a vendor (helper method).
      */
-    public Long getTotalReviewCount(Long vendorId) {
+    public Long getTotalReviewCount(UUID vendorId) {
         Long count = reviewRepository.countReviewsForVendor(vendorId);
         return count == null ? 0L : count;
     }
 }
-

@@ -12,6 +12,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
+
 @RestController
 @RequestMapping("/api/reviews")
 @RequiredArgsConstructor
@@ -33,7 +35,7 @@ public class ReviewController {
 
     @GetMapping("/vendor/{vendorId}")
     public ResponseEntity<ApiResponse<PageResponse<ReviewResponse>>> getReviewsByVendor(
-            @PathVariable Long vendorId,
+            @PathVariable UUID vendorId,
             Pageable pageable
     ) {
         return ResponseEntity.ok(ApiResponse.success(
@@ -54,7 +56,7 @@ public class ReviewController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<ReviewResponse>> getReview(@PathVariable Long id) {
+    public ResponseEntity<ApiResponse<ReviewResponse>> getReview(@PathVariable UUID id) {
         return ResponseEntity.ok(ApiResponse.success(
                 reviewService.getReviewById(id),
                 "Review fetched successfully"
@@ -63,7 +65,7 @@ public class ReviewController {
 
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<ReviewResponse>> updateReview(
-            @PathVariable Long id,
+            @PathVariable UUID id,
             @Valid @RequestBody ReviewRequest request,
             @RequestHeader("Authorization") String token
     ) {
@@ -75,11 +77,10 @@ public class ReviewController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Void>> deleteReview(
-            @PathVariable Long id,
+            @PathVariable UUID id,
             @RequestHeader("Authorization") String token
     ) {
         reviewService.deleteReview(id, token);
         return ResponseEntity.ok(ApiResponse.success(null, "Review deleted successfully"));
     }
 }
-

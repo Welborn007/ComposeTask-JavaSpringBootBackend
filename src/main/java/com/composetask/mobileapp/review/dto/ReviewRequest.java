@@ -6,11 +6,13 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
+import java.util.UUID;
+
 @Data
 public class ReviewRequest {
 
     @NotNull(message = "Vendor ID is required")
-    private Long vendorId;
+    private UUID vendorId;
 
     @NotNull(message = "Rating is required")
     @Min(value = 1, message = "Rating must be at least 1")

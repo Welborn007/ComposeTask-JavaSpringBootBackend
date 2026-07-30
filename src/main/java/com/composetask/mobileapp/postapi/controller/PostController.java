@@ -17,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/posts")
@@ -65,7 +66,7 @@ public class PostController {
     // 🔒 Update post (owner only)
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<PostResponse>>updatePost(
-            @PathVariable Long id,
+            @PathVariable UUID id,
             @Valid @RequestBody UpdatePostRequest request,
             @RequestHeader("Authorization") String token
     ) {
@@ -80,7 +81,7 @@ public class PostController {
     // 🔒 Delete post (owner only)
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Void>> deletePost(
-            @PathVariable Long id,
+            @PathVariable UUID id,
             @RequestHeader("Authorization") String token
     ) {
         postService.deletePost(id, token);

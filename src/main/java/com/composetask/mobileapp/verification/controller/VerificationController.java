@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/verification")
@@ -20,13 +21,12 @@ public class VerificationController {
 
     @PostMapping("/{vendorId}")
     public ResponseEntity<ApiResponse<VerificationResponse>> submit(
-            @PathVariable Long vendorId,
-            @Valid @RequestBody CreateVerificationRequest request,
-            @RequestHeader("Authorization") String token
+            @PathVariable UUID vendorId,
+            @Valid @RequestBody CreateVerificationRequest request
     ) {
         return ResponseEntity.ok(
                 ApiResponse.success(
-                        verificationService.submitVerification(vendorId, request, token),
+                        verificationService.submitVerification(vendorId, request),
                         "Document submitted"
                 )
         );
@@ -34,12 +34,11 @@ public class VerificationController {
 
     @GetMapping("/{vendorId}")
     public ResponseEntity<ApiResponse<List<VerificationResponse>>> get(
-            @PathVariable Long vendorId,
-            @RequestHeader("Authorization") String token
+            @PathVariable UUID vendorId
     ) {
         return ResponseEntity.ok(
                 ApiResponse.success(
-                        verificationService.getVendorVerification(vendorId, token),
+                        verificationService.getVendorVerification(vendorId),
                         "Verification fetched"
                 )
         );
@@ -47,25 +46,21 @@ public class VerificationController {
 
     @PutMapping("/{id}/approve")
     public ResponseEntity<ApiResponse<VerificationResponse>> approve(
-            @PathVariable Long id,
-            @RequestHeader("Authorization") String token
+            @PathVariable UUID id
     ) {
         return ResponseEntity.ok(
                 ApiResponse.success(
-                        verificationService.approve(id, token),
+                        verificationService.approve(id),
                         "Approved"
                 )
         );
     }
 
     @PutMapping("/{id}/reject")
-    public ResponseEntity<ApiResponse<VerificationResponse>> reject(
-            @PathVariable Long id,
-            @RequestHeader("Authorization") String token
-    ) {
+    public ResponseEntity<ApiResponse<VerificationResponse>> reject(@PathVariable UUID id) {
         return ResponseEntity.ok(
                 ApiResponse.success(
-                        verificationService.reject(id, token),
+                        verificationService.reject(id),
                         "Rejected"
                 )
         );

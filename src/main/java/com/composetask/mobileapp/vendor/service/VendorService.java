@@ -19,6 +19,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Placeholder service for vendor business logic.
@@ -108,7 +109,7 @@ public class VendorService {
     }
 
     // UPDATE (ownership)
-    public VendorResponse updateVendor(Long id, UpdateVendorRequest request, String token) {
+    public VendorResponse updateVendor(UUID id, UpdateVendorRequest request, String token) {
 
         String email = extractEmail(token);
 
@@ -128,7 +129,7 @@ public class VendorService {
     }
 
     // DELETE
-    public void deleteVendor(Long id, String token) {
+    public void deleteVendor(UUID id, String token) {
 
         String email = extractEmail(token);
 

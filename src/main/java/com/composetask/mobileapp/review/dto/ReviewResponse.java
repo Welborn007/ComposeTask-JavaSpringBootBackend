@@ -5,14 +5,15 @@ import lombok.Builder;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Data
 @Builder
 public class ReviewResponse {
 
-    private Long id;
-    private Long vendorId;
-    private Long customerId;
+    private UUID id;
+    private UUID vendorId;
+    private UUID customerId;
     private String vendorName;
     private String customerName;
     private Integer rating;

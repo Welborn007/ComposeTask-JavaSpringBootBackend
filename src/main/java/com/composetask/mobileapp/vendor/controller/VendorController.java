@@ -13,6 +13,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
+
 /**
  * Placeholder controller for vendor-related endpoints.
  */
@@ -80,7 +82,7 @@ public class VendorController {
 
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<VendorResponse>> updateVendor(
-            @PathVariable Long id,
+            @PathVariable UUID id,
             @Valid @RequestBody UpdateVendorRequest request,
             @RequestHeader("Authorization") String token
     ) {
@@ -94,7 +96,7 @@ public class VendorController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Void>> deleteVendor(
-            @PathVariable Long id,
+            @PathVariable UUID id,
             @RequestHeader("Authorization") String token
     ) {
         vendorService.deleteVendor(id, token);

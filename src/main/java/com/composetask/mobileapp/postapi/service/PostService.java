@@ -16,6 +16,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class PostService {
@@ -106,7 +107,7 @@ public class PostService {
     }
 
     public PostResponse updatePost(
-            Long postId,
+            UUID postId,
             UpdatePostRequest request,
             String token
     ) {
@@ -127,7 +128,7 @@ public class PostService {
         return mapToResponse(updated);
     }
 
-    public void deletePost(Long postId, String token) {
+    public void deletePost(UUID postId, String token) {
         String email = jwtUtil.extractEmail(token.replace("Bearer ", ""));
 
         Post post = postRepository.findById(postId)

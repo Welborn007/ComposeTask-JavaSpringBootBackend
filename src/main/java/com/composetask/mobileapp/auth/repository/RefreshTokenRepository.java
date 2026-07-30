@@ -9,17 +9,17 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Repository
-public interface RefreshTokenRepository extends JpaRepository<RefreshToken, Long> {
+public interface RefreshTokenRepository extends JpaRepository<RefreshToken, UUID> {
 
     Optional<RefreshToken> findByToken(String token);
 
-    Optional<RefreshToken> findByUserIdAndIsRevokedFalse(Long userId);
+    Optional<RefreshToken> findByUserIdAndIsRevokedFalse(UUID userId);
 
     @Transactional
     @Modifying
     @Query("UPDATE RefreshToken rt SET rt.isRevoked = true WHERE rt.user.id = :userId")
-    void revokeAllByUserId(@Param("userId") Long userId);
+    void revokeAllByUserId(@Param("userId") UUID userId);
 }
-

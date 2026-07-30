@@ -12,6 +12,7 @@ import java.util.List;
 import org.springframework.security.core.Authentication;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/users")
@@ -29,29 +30,28 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<UserResponse> getUserById(@PathVariable Long id, Authentication authentication) {
-        UserResponse user = userService.getUserById(id, authentication.getName());
+    public ResponseEntity<UserResponse> getUserById(@PathVariable UUID id) {
+        UserResponse user = userService.getUserById(id);
         return ResponseEntity.ok(user);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<UserResponse> updateUser(
-            @PathVariable Long id,
-            @RequestBody @Valid UpdateUserRequest request,
-            Authentication authentication
+            @PathVariable UUID id,
+            @RequestBody @Valid UpdateUserRequest request
     ) {
-        UserResponse updated = userService.updateUser(id, request, authentication.getName());
+        UserResponse updated = userService.updateUser(id, request);
         return ResponseEntity.ok(updated);
     }
 
     @PutMapping("/{id}/role")
-    public ResponseEntity<UserResponse> updateUserRole(@PathVariable Long id, @RequestBody @Valid com.composetask.mobileapp.userapi.dto.UpdateRoleRequest request) {
+    public ResponseEntity<UserResponse> updateUserRole(@PathVariable UUID id, @RequestBody @Valid com.composetask.mobileapp.userapi.dto.UpdateRoleRequest request) {
         UserResponse updated = userService.updateUserRole(id, request.getRole());
         return ResponseEntity.ok(updated);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteUser(@PathVariable UUID id) {
         userService.deleteUser(id);
         return ResponseEntity.noContent().build();
     }

@@ -14,10 +14,12 @@ import com.composetask.mobileapp.verification.model.VerificationStatus;
 import com.composetask.mobileapp.verification.repository.VerificationRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -30,12 +32,11 @@ public class VerificationService {
 
     // 📌 Submit document
     public VerificationResponse submitVerification(
-            Long vendorId,
-            CreateVerificationRequest request,
-            String token
+            UUID vendorId,
+            CreateVerificationRequest request
     ) {
 
-        String email = extractEmail(token);
+        String email = getCurrentUserEmail();
 
         Vendor vendor = vendorRepository.findById(vendorId)
                 .orElseThrow(() -> new RuntimeException("Vendor not found"));
@@ -56,22 +57,7 @@ public class VerificationService {
     }
 
     // 📌 Get vendor verification
-    public List<VerificationResponse> getVendorVerification(Long vendorId, String token) {
-        String email = extractEmail(token);
-
-        Vendor vendor = vendorRepository.findById(vendorId)
-                .orElseThrow(() -> new RuntimeException("Vendor not found"));
-
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
-        boolean isAdmin = user.getRole() == Constants.Role.ADMIN;
-        boolean isOwner = vendor.getUser().getEmail().equals(email);
-
-        if (!isAdmin && !isOwner) {
-            throw new UnauthorizedException("Not your vendor");
-        }
-
+    public List<VerificationResponse> getVendorVerification(UUID vendorId) {
         return verificationRepository.findByVendorId(vendorId)
                 .stream()
                 .map(this::mapToResponse)
@@ -80,9 +66,9 @@ public class VerificationService {
 
     // 📌 Approve (admin)
     @Transactional
-    public VerificationResponse approve(Long id, String token) {
+    public VerificationResponse approve(UUID id) {
 
-        String email = extractEmail(token);
+        String email = getCurrentUserEmail();
         assertAdmin(email);
 
         Verification verification = verificationRepository.findById(id)
@@ -99,8 +85,8 @@ public class VerificationService {
     }
 
     // 📌 Reject
-    public VerificationResponse reject(Long id, String token) {
-        String email = extractEmail(token);
+    public VerificationResponse reject(UUID id) {
+        String email = getCurrentUserEmail();
         assertAdmin(email);
 
         Verification verification = verificationRepository.findById(id)
@@ -114,11 +100,8 @@ public class VerificationService {
     }
 
     // 🔑 Helper
-    private String extractEmail(String token) {
-        if (token == null || !token.startsWith("Bearer ")) {
-            throw new UnauthorizedException("Invalid token");
-        }
-        return jwtUtil.extractEmail(token.substring(7));
+    private String getCurrentUserEmail() {
+        return SecurityContextHolder.getContext().getAuthentication().getName();
     }
 
     private void assertAdmin(String email) {

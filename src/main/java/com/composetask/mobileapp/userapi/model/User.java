@@ -4,6 +4,8 @@ import com.composetask.mobileapp.Constants;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.UUID;
+
 @Entity
 @Data
 @NoArgsConstructor
@@ -13,8 +15,8 @@ import lombok.*;
 public class User {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
     private String name;
 
@@ -27,4 +29,3 @@ public class User {
     @Builder.Default
     private Constants.Role role = Constants.Role.USER; // ✅ default role
 }
-

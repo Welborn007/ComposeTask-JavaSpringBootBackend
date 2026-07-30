@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.UUID;
+
 /**
  * Controller for trust score endpoints.
  * Exposes vendor rating and trust score information.
@@ -26,9 +28,8 @@ public class TrustScoreController {
      * Returns: average rating, total reviews, verification status, and computed trust score.
      */
     @GetMapping("/vendor/{vendorId}")
-    public ResponseEntity<ApiResponse<TrustScoreResponse>> getTrustScore(@PathVariable Long vendorId) {
+    public ResponseEntity<ApiResponse<TrustScoreResponse>> getTrustScore(@PathVariable UUID vendorId) {
         TrustScoreResponse response = trustScoreService.getTrustScore(vendorId);
         return ResponseEntity.ok(ApiResponse.success(response, "Trust score fetched successfully"));
     }
 }
-

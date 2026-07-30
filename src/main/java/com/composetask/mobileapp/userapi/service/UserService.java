@@ -7,9 +7,11 @@ import com.composetask.mobileapp.userapi.dto.UpdateUserRequest;
 import com.composetask.mobileapp.userapi.dto.UserResponse;
 import com.composetask.mobileapp.userapi.model.User;
 import com.composetask.mobileapp.userapi.repository.UserRepository;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class UserService {
@@ -27,20 +29,20 @@ public class UserService {
                 .toList();
     }
 
-    public UserResponse getUserById(Long id, String requesterEmail) {
+    public UserResponse getUserById(UUID id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
-        assertSelfOrAdmin(user, requesterEmail);
+        assertSelfOrAdmin(user);
         return mapToUserResponse(user);
     }
 
     // ✅ Update user
-    public UserResponse updateUser(Long id, UpdateUserRequest request, String requesterEmail) {
+    public UserResponse updateUser(UUID id, UpdateUserRequest request) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
-        assertSelfOrAdmin(user, requesterEmail);
+        assertSelfOrAdmin(user);
         user.setName(request.getName());
         user.setEmail(request.getEmail());
 
@@ -49,7 +51,7 @@ public class UserService {
     }
 
     // ✅ Delete user
-    public void deleteUser(Long id) {
+    public void deleteUser(UUID id) {
         if (!userRepository.existsById(id)) {
             throw new ResourceNotFoundException("User not found");
         }
@@ -57,7 +59,7 @@ public class UserService {
     }
 
     // ✅ Update user role (admin only)
-    public UserResponse updateUserRole(Long id, String roleName) {
+    public UserResponse updateUserRole(UUID id, String roleName) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
@@ -72,7 +74,8 @@ public class UserService {
         return mapToUserResponse(saved);
     }
 
-    private void assertSelfOrAdmin(User targetUser, String requesterEmail) {
+    private void assertSelfOrAdmin(User targetUser) {
+        String requesterEmail = getCurrentUserEmail();
         User requester = userRepository.findByEmail(requesterEmail)
                 .orElseThrow(() -> new ResourceNotFoundException("Authenticated user not found"));
 
@@ -82,6 +85,10 @@ public class UserService {
         if (!isSelf && !isAdmin) {
             throw new UnauthorizedException("You are not allowed to access this user");
         }
+    }
+
+    private String getCurrentUserEmail() {
+        return SecurityContextHolder.getContext().getAuthentication().getName();
     }
 
     // 🔁 Mapper (private)
