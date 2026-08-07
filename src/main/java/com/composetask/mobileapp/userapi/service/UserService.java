@@ -11,7 +11,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.UUID;
 
 @Service
 public class UserService {
@@ -29,20 +28,23 @@ public class UserService {
                 .toList();
     }
 
-    public UserResponse getUserById(UUID id) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
-
-        assertSelfOrAdmin(user);
+    // ✅ Get current authenticated user (from JWT)
+    public UserResponse getCurrentUser() {
+        String email = getCurrentUserEmail();
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("Authenticated user not found"));
         return mapToUserResponse(user);
     }
 
-    // ✅ Update user
-    public UserResponse updateUser(UUID id, UpdateUserRequest request) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+    // ✅ Update current authenticated user (no id required)
+    public UserResponse updateCurrentUser(UpdateUserRequest request) {
+        String email = getCurrentUserEmail();
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("Authenticated user not found"));
 
+        // assertSelfOrAdmin not necessary since this is the current user, but keep admin ability
         assertSelfOrAdmin(user);
+
         user.setName(request.getName());
         user.setEmail(request.getEmail());
 
@@ -50,18 +52,19 @@ public class UserService {
         return mapToUserResponse(saved);
     }
 
-    // ✅ Delete user
-    public void deleteUser(UUID id) {
-        if (!userRepository.existsById(id)) {
-            throw new ResourceNotFoundException("User not found");
-        }
-        userRepository.deleteById(id);
+    // ✅ Delete current authenticated user (no id required)
+    public void deleteCurrentUser() {
+        String email = getCurrentUserEmail();
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("Authenticated user not found"));
+        userRepository.deleteById(user.getId());
     }
 
-    // ✅ Update user role (admin only)
-    public UserResponse updateUserRole(UUID id, String roleName) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+    // ✅ Update role for current authenticated user (no id required)
+    public UserResponse updateCurrentUserRole(String roleName) {
+        String email = getCurrentUserEmail();
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("Authenticated user not found"));
 
         try {
             Constants.Role role = Constants.Role.valueOf(roleName);

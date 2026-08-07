@@ -42,12 +42,15 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/auth/logout").authenticated()
 
                         // Users
-                        .requestMatchers(HttpMethod.GET, "/api/users/me").authenticated()
                         .requestMatchers(HttpMethod.GET, "/api/users").permitAll()
-                        .requestMatchers(HttpMethod.PUT, "/api/users/*/role").hasRole("ADMIN")
+                        // role updates remain admin-only (now without id in path)
+                        .requestMatchers(HttpMethod.PUT, "/api/users/role").hasRole("ADMIN")
+                        // admins can still delete any user (kept for backwards compatibility)
                         .requestMatchers(HttpMethod.DELETE, "/api/users/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.GET, "/api/users/*").authenticated()
-                        .requestMatchers(HttpMethod.PUT, "/api/users/*").authenticated()
+                        // allow authenticated users to delete their own account
+                        .requestMatchers(HttpMethod.DELETE, "/api/users").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/users/me").authenticated()
+                        .requestMatchers(HttpMethod.PUT, "/api/users").authenticated()
 
                         // Public GET for posts
                         .requestMatchers(HttpMethod.GET, "/api/posts/**").permitAll()

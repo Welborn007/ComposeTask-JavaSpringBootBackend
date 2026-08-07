@@ -9,10 +9,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import org.springframework.security.core.Authentication;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/users")
@@ -29,41 +25,28 @@ public class UserController {
         return ResponseEntity.ok(userService.getAllUsers());
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<UserResponse> getUserById(@PathVariable UUID id) {
-        UserResponse user = userService.getUserById(id);
+    // Use JWT-authenticated user (no id in path)
+    @GetMapping("/me")
+    public ResponseEntity<UserResponse> getCurrentUser() {
+        UserResponse user = userService.getCurrentUser();
         return ResponseEntity.ok(user);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<UserResponse> updateUser(
-            @PathVariable UUID id,
-            @RequestBody @Valid UpdateUserRequest request
-    ) {
-        UserResponse updated = userService.updateUser(id, request);
+    @PutMapping
+    public ResponseEntity<UserResponse> updateCurrentUser(@RequestBody @Valid UpdateUserRequest request) {
+        UserResponse updated = userService.updateCurrentUser(request);
         return ResponseEntity.ok(updated);
     }
 
-    @PutMapping("/{id}/role")
-    public ResponseEntity<UserResponse> updateUserRole(@PathVariable UUID id, @RequestBody @Valid com.composetask.mobileapp.userapi.dto.UpdateRoleRequest request) {
-        UserResponse updated = userService.updateUserRole(id, request.getRole());
+    @PutMapping("/role")
+    public ResponseEntity<UserResponse> updateCurrentUserRole(@RequestBody @Valid com.composetask.mobileapp.userapi.dto.UpdateRoleRequest request) {
+        UserResponse updated = userService.updateCurrentUserRole(request.getRole());
         return ResponseEntity.ok(updated);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteUser(@PathVariable UUID id) {
-        userService.deleteUser(id);
+    @DeleteMapping
+    public ResponseEntity<Void> deleteCurrentUser() {
+        userService.deleteCurrentUser();
         return ResponseEntity.noContent().build();
-    }
-
-    @GetMapping("/me")
-    public ResponseEntity<Map<String, Object>> getMe(Authentication authentication) {
-        Map<String,Object> resp = new HashMap<>();
-        if (authentication == null) {
-            return ResponseEntity.status(401).body(null);
-        }
-        resp.put("username", authentication.getName());
-        resp.put("roles", authentication.getAuthorities().stream().map(a -> a.getAuthority()).toList());
-        return ResponseEntity.ok(resp);
     }
 }
